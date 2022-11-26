@@ -1,5 +1,10 @@
 # Untitled Chore App
 
+## Info
+
+- [FastAPI docs](https://fastapi.tiangolo.com/)
+- [Poetry Basic Usage](https://python-poetry.org/docs/basic-usage/)
+
 ## How to run
 
 ### Poetry
@@ -9,7 +14,7 @@
 ```bash
 poetry install
 poetry shell
-func start
+python main.py
 ```
 
 ### Venv
@@ -18,5 +23,5 @@ func start
 python -m venv .venv
 ./.venv/Scripts/activate
 pip install -r requirements.txt
-func start
+python main.py
 ```

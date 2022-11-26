@@ -1,5 +1,5 @@
 from fastapi import Depends
-from lib.db.user import get_user, User
+from lib.db.user import get_user_by_username, User
 from fastapi import HTTPException
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
@@ -22,7 +22,7 @@ async def get_current_user(token: str = Depends(auth.oauth2_scheme)):
     except JWTError:
         raise credentials_exception
 
-    user = get_user(username=token_data.username)
+    user = await get_user_by_username(username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
@@ -38,8 +38,8 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
 # * passwords
 
 
-def authenticate_user(username: str, password: str):
-    user = get_user(username)
+async def authenticate_user(username: str, password: str):
+    user = await get_user_by_username(username)
     if not user:
         return False
 
