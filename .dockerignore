@@ -1,0 +1,8 @@
+.venv
+poetry.lock
+pyproject.toml
+.gitignore
+**/__pycache__
+tests
+.git
+.vscode

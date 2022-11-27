@@ -36,7 +36,7 @@ async def get_user_by_username(username: str) -> User | None:
         return User(**items[0])
 
 
-async def register_user(user: UserIn) -> str | None:
+async def register_user(user: UserIn):
     async with get_client() as client:
         container = await get_or_create_container(client, "users")
         await container.create_item(
@@ -50,5 +50,3 @@ async def register_user(user: UserIn) -> str | None:
             },
             enable_automatic_id_generation=True,
         )
-
-        return None
