@@ -2,7 +2,7 @@ from lib.db import user, db
 from typing import List
 from pydantic import BaseModel
 
-class Home:
+class Home(BaseModel):
   id: str
   name: str
   residents: List[str]
@@ -13,21 +13,34 @@ class HomeIn(BaseModel):
   name: str
   residents: List[str] | None = None
   chores: List[str] | None = None
+  
 
 async def register_home(home: HomeIn, creator: str):
   async with db.get_client() as client:
-    container = await db.get_or_create_container(client, "homes")
+    containerHomes = await db.get_or_create_container(client, "homes")
+    containerUsers = await db.get_or_create_container(client, "users")
     
-    if home.residents is None:
-      home.residents = []
+    users_res = containerUsers.query_items(
+      """
+      SELECT u.username
+      FROM users u
+      WHERE ARRAY_CONTAINS(@username, u.username)
+      """,
+      parameters=[{"name": "@username", "value": home.residents}],
+    )
+    
+    res = [u["username"] async for u in users_res]
       
-    home.residents.append(creator)
-    await container.create_item(
+    res.append(creator)
+    res = await containerHomes.create_item(
       {
         "name": home.name,
-        "residents": home.residents,
+        "residents": res,
         "chores": [] if home.chores is None else home.chores,
         "creator": creator
       },
       enable_automatic_id_generation=True,
     )
+    
+    return Home(**res)
+  
