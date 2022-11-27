@@ -5,7 +5,11 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 import uvicorn
 import logging
 
-app = FastAPI(title="untitled-chore-api", version="0.1.0")
+app = FastAPI(
+    title="Untitled Chore API",
+    version="0.1.0",
+    description="The official API for untitled-chore-app.",
+)
 app.include_router(router)
 
 # app.add_middleware(HTTPSRedirectMiddleware)

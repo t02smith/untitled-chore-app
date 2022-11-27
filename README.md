@@ -2,6 +2,8 @@
 
 ## Info
 
+Run the application and head to [http://localhost/docs](http://localhost/docs)
+
 - [FastAPI docs](https://fastapi.tiangolo.com/)
 - [Poetry Basic Usage](https://python-poetry.org/docs/basic-usage/)
 

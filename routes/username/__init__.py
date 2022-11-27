@@ -16,3 +16,11 @@ async def get_user_chores(
     username: str, user: user.User = Depends(get_current_active_user)
 ):
     return await chores.get_chores_from_user(username, user.username == username)
+
+
+@router.get(
+    "/timetable",
+    description="Returns the user's timetable that includes every household.",
+)
+async def get_user_timetable(user: user.User = Depends(get_current_active_user)):
+    return "timetable"
