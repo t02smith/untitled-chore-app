@@ -16,7 +16,7 @@ router.include_router(house)
 router.include_router(username)
 
 
-@router.post("/login", response_model=tokens.Token)
+@router.post("/login", response_model=tokens.Token, tags=["user"])
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = await userAuth.authenticate_user(form_data.username, form_data.password)
     if not user:
@@ -33,7 +33,11 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.post("/register", response_model=tokens.Token)
+@router.post(
+    "/register",
+    response_model=tokens.Token,
+    tags=["user"],
+)
 async def register(userInfo: UserIn):
     # ? check format for username, password, email
 
@@ -46,8 +50,3 @@ async def register(userInfo: UserIn):
         data={"sub": userInfo.username}, expires_delta=access_token_Expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-@router.post("/logout")
-async def logout(user: User = Depends(get_current_active_user)):
-    return ""

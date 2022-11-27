@@ -30,7 +30,6 @@ async def get_current_user(token: str = Depends(auth.oauth2_scheme)):
 
 async def get_current_active_user(current_user: User = Depends(get_current_user)):
     if current_user.disabled:
-        # TODO change to redirect
         raise HTTPException(status_code=400, detail="Inactive user")
     return User(**current_user.__dict__)
 
