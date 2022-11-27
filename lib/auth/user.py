@@ -43,7 +43,7 @@ async def authenticate_user(username: str, password: str):
     if not user:
         return False
 
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.password):
         return False
 
     return user

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routes.index import router
+from routes import router
 import uvicorn
 import logging
 

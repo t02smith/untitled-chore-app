@@ -1,21 +1,27 @@
 from pydantic import BaseModel
 from lib.db.db import get_or_create_container, get_client
+from lib.auth.auth import pwd_context
 
 
 class User(BaseModel):
-    id: str | None = None
+    id: str
     username: str
-    email: str | None = None
-    first_name: str | None = None
-    surname: str | None = None
-    disabled: bool | None = None
+    password: str
+    email: str
+    first_name: str
+    surname: str
+    disabled: bool
 
 
-class UserDB(User):
-    hashed_password: str
+class UserIn(BaseModel):
+    username: str
+    password: str
+    email: str
+    first_name: str
+    surname: str
 
 
-async def get_user_by_username(username: str) -> UserDB | None:
+async def get_user_by_username(username: str) -> User | None:
     async with get_client() as client:
         container = await get_or_create_container(client, "users")
 
@@ -27,21 +33,22 @@ async def get_user_by_username(username: str) -> UserDB | None:
         if len(items) == 0:
             return None
 
-        return UserDB(**items[0])
+        return User(**items[0])
 
 
-async def register_user(user: UserDB):
-  return True
-    # async with get_client() as client:
-    #     container = await get_or_create_container(client, "users")
-    #     await container.create_item(
-    #         {
-    #             "username": user.username,
-    #             "password": user.hashed_password,
-    #             "first_name": user.first_name,
-    #             "surname": user.surname,
-    #             "email": user.email,
-    #             "disabled": False,
-    #         },
-    #         enable_automatic_id_generation=True,
-    #     )
+async def register_user(user: UserIn) -> str | None:
+    async with get_client() as client:
+        container = await get_or_create_container(client, "users")
+        await container.create_item(
+            {
+                "username": user.username,
+                "password": pwd_context.hash(user.password),
+                "first_name": user.first_name,
+                "surname": user.surname,
+                "email": user.email,
+                "disabled": False,
+            },
+            enable_automatic_id_generation=True,
+        )
+
+        return None
