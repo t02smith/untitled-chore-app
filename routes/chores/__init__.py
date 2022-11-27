@@ -36,3 +36,8 @@ async def get_chores(user: User = Depends(get_current_active_user)):
 )
 async def get_chore_by_id(id: str, user: User = Depends(get_current_active_user)):
     return await chores.get_chore_by_id(id, user.username)
+
+
+@router.put("/")
+async def update_chore(id: str, user: User = Depends(get_current_active_user)):
+    return await chores.update_chore(id, user.username)
