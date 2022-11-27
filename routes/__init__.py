@@ -4,10 +4,11 @@ from routes.house import router as house
 from routes.username import router as username
 from lib.auth.user import get_current_active_user
 from lib.db.db import get_or_create_database
-from lib.db.user import UserIn, User
+from lib.db.user import UserIn, User, register_user
 from lib.auth import tokens, user as userAuth, auth
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
+
 
 router = APIRouter(prefix="/api/v1")
 router.include_router(chores)

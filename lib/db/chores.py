@@ -27,7 +27,7 @@ class ChoreOut(BaseModel):
     public: bool
 
 
-async def create_chore(chore: ChoreIn, user: user.User):
+async def create_chore(chore: ChoreIn, user: user.User) -> ChoreOut:
     async with db.get_client() as client:
         container = await db.get_or_create_container(client, "chores")
         chore = await container.create_item(
@@ -42,3 +42,37 @@ async def create_chore(chore: ChoreIn, user: user.User):
         )
 
         return ChoreOut(**chore)
+
+
+async def get_chores_from_user(username: str):
+    async with db.get_client() as client:
+        container = await db.get_or_create_container(client, "chores")
+        chores_res = container.query_items(
+            """
+        SELECT c.id, c.name, c.author, c.expected_time, c.description, c.public
+        FROM chores c
+        WHERE c.author=@username
+      """,
+            parameters=[{"name": "@username", "value": username}],
+        )
+
+        chores = [ChoreOut(**c) async for c in chores_res]
+        return chores
+
+
+async def get_chore_by_id(id: str, username: str):
+    async with db.get_client() as client:
+        container = await db.get_or_create_container(client, "chores")
+        chore_res = container.query_items(
+            """
+            SELECT c.id, c.name, c.author, c.expected_time, c.description, c.public
+            FROM chores c
+            WHERE (c.author=@username OR c.public) AND c.id=@id
+          """,
+            parameters=[
+                {"name": "@username", "value": username},
+                {"name": "@id", "value": id},
+            ],
+        )
+
+        return [ChoreOut(**c) async for c in chores_res][0]
