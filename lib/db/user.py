@@ -21,6 +21,19 @@ class UserIn(BaseModel):
     surname: str
 
 
+class UserUpdate(BaseModel):
+    password: str | None = None
+    first_name: str | None = None
+    surname: str | None = None
+
+
+class UserOut(BaseModel):
+    username: str
+    email: str
+    first_name: str
+    surname: str
+
+
 async def get_user_by_username(username: str) -> User | None:
     async with get_client() as client:
         container = await get_or_create_container(client, "users")
@@ -49,4 +62,28 @@ async def register_user(user: UserIn):
                 "disabled": False,
             },
             enable_automatic_id_generation=True,
+        )
+
+
+async def update_user(old, updated: UserUpdate) -> UserOut:
+    async with get_client() as client:
+        container = await get_or_create_container(client, "users")
+        return UserOut(
+            **await container.upsert_item(
+                {
+                    "id": old.id,
+                    "username": old.username,
+                    "password": old.password
+                    if updated.password is None
+                    else pwd_context.hash(updated.password),
+                    "email": old.email,
+                    "first_name": old.first_name
+                    if updated.first_name is None
+                    else updated.first_name,
+                    "surname": old.surname
+                    if updated.surname is None
+                    else updated.surname,
+                    "disabled": old.disabled,
+                }
+            )
         )
