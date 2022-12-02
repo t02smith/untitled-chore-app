@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from routes.chores import router as chores
-from routes.house import router as house
-from routes.username import router as username
+from routes import chores, house, username, timetable
 from lib.auth.user import get_current_active_user
 from lib.db.db import get_or_create_database
 from lib.db.user import UserIn, User, register_user
@@ -11,9 +9,10 @@ from datetime import datetime, timedelta
 
 
 router = APIRouter(prefix="/api/v1")
-router.include_router(chores)
-router.include_router(house)
-router.include_router(username)
+router.include_router(chores.router)
+router.include_router(house.router)
+router.include_router(username.router)
+router.include_router(timetable.router)
 
 
 @router.post("/login", response_model=tokens.Token, tags=["user"])
