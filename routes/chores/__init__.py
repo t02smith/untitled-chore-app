@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from lib.db import chores
-from lib.auth.user import get_current_active_user, User
+from lib.db.user import User
+from lib.auth.user import get_current_active_user
 from typing import List
 
 router = APIRouter(prefix="/chores")

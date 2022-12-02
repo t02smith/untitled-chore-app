@@ -37,3 +37,15 @@ python -m venv .venv
 pip install -r requirements.txt
 python main.py
 ```
+
+## Testing
+
+To test run:
+
+```bash
+poetry run pytest ./tests
+
+# or
+poetry shell
+pytest ./tests
+```

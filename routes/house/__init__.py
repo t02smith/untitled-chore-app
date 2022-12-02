@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from lib.db import home
-from lib.auth.user import get_current_active_user, User
+from lib.auth.user import get_current_active_user
+from lib.db.user import User
 
 router = APIRouter(prefix="/house")
 
