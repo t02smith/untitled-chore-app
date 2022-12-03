@@ -14,6 +14,9 @@ class HomeIn(BaseModel):
   residents: List[str] | None = None
   chores: List[str] | None = None
   
+class HomeUpdate(BaseModel):
+  name: str | None = None
+  
 
 async def register_home(home: HomeIn, creator: str):
   async with db.get_client() as client:
@@ -43,4 +46,7 @@ async def register_home(home: HomeIn, creator: str):
     )
     
     return Home(**res)
+  
+async def update_home(home: HomeUpdate):
+  return
   
