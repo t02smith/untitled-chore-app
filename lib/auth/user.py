@@ -1,5 +1,5 @@
 from fastapi import Depends
-from lib.db.user import get_user_by_username, User
+from lib.db import user as userDB
 from fastapi import HTTPException
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
@@ -22,36 +22,34 @@ async def get_current_user(token: str = Depends(auth.oauth2_scheme)):
     except JWTError:
         raise credentials_exception
 
-    user = await get_user_by_username(username=token_data.username)
+    user = await userDB.get_user_by_username(username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
 
 
-async def get_current_active_user(current_user: User = Depends(get_current_user)):
+async def get_current_active_user(
+    current_user: userDB.User = Depends(get_current_user),
+):
     if current_user.disabled:
         # TODO change to redirect
         raise HTTPException(status_code=400, detail="Inactive user")
-    return User(**current_user.__dict__)
+    return userDB.User(**current_user.__dict__)
 
 
 # * passwords
 
 
 async def authenticate_user(username: str, password: str):
-    user = await get_user_by_username(username)
+    user = await userDB.get_user_by_username(username)
     if not user:
-        return False
+        return None
 
     if not verify_password(password, user.password):
-        return False
+        return None
 
     return user
 
 
 def verify_password(plaintext, hashed):
     return auth.pwd_context.verify(plaintext, hashed)
-
-
-def get_password_hash(password):
-    return auth.pwd_context.hash(password)

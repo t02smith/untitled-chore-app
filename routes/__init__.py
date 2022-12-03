@@ -19,7 +19,7 @@ router.include_router(username)
 @router.post("/login", response_model=tokens.Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = await userAuth.authenticate_user(form_data.username, form_data.password)
-    if not user:
+    if user is None:
         raise HTTPException(
             status_code=401,
             detail="Incorrect username or password",
