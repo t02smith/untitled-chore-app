@@ -14,6 +14,6 @@ async def create_home(
 
 @router.put("/")
 async def update_home(
-  newHome: home.HomeIn, user: User = Depends(get_current_active_user)
+  id: str, newHome: home.HomeIn, user: User = Depends(get_current_active_user)
 ):
-  return await home.update_home(newHome)
+  return await home.update_home(newHome, id, user)
