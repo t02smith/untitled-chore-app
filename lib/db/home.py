@@ -19,7 +19,7 @@ class HomeUpdate(BaseModel):
   name: str | None = None
   
 
-async def register_home(home: HomeIn, user: user.User):
+async def create_home(home: HomeIn, user: user.User):
   async with db.get_client() as client:
     container_homes = await db.get_or_create_container(client, "homes")
     container_users = await db.get_or_create_container(client, "users")
