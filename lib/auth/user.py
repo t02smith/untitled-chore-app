@@ -32,7 +32,6 @@ async def get_current_active_user(
     current_user: userDB.User = Depends(get_current_user),
 ):
     if current_user.disabled:
-        # TODO change to redirect
         raise HTTPException(status_code=400, detail="Inactive user")
     return userDB.User(**current_user.__dict__)
 
