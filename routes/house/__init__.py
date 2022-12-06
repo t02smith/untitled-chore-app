@@ -16,18 +16,8 @@ async def create_home(
 ):
   return await home.create_home(newhome, user.username)
 
-@router.put(
-  "/",
-  description="Update an existing house",
-  tags=["house"]
-)
-async def update_home(
-  id: str, newHome: home.HomeIn, user: User = Depends(get_current_active_user)
-):
-  return await home.update_home(newHome, id, user)
-
 @router.get(
-  "/",
+  "/getHomes",
   description="Get the homes that contain a certain user",
   tags=["house"]
 )
@@ -35,7 +25,7 @@ async def get_homes(user: User = Depends(get_current_active_user)):
   return await home.get_homes(user)
 
 @router.get(
-  "/",
+  "/getHome",
   description="Get a home by id",
   tags=["house"]
 )
@@ -43,7 +33,7 @@ async def get_home(id: str, user: User = Depends(get_current_active_user)):
   return await home.get_homes(id)
 
 @router.delete(
-  "/",
+  "/deleteHome",
   description="Delete a house by id. Only the creator of the house can do this",
   tags=["house"]
 )

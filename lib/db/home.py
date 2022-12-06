@@ -48,18 +48,27 @@ async def create_home(home: HomeIn, user: user.User):
     
     return Home(**res)
   
-async def update_home(home: HomeUpdate, id: str, user: user.User):
+async def update_home(homeUpdate: HomeUpdate, creator: str, house_name: str, user: user.User):
   async with db.get_client() as client:
     container_homes = await db.get_or_create_container(client, "homes")
     
-    home_res = await container_homes.read_item(id, partition_key=id)
+    # home_res = await container_homes.read_item(id, partition_key=id)
+    home_res = container_homes.query_items(
+      """
+      SELECT * 
+      FROM homes h
+      WHERE h.creator=@creator AND h.name=@name
+      """, parameters=[{"name": "@creator", "value": creator}, {"name": "@name", "value": house_name}]
+    )
     
-    if (home_res["creator"] == user.username):
-      home_res["name"] = home.name if home.name != None else home_res["name"]
-      await container_homes.upsert_item(home_res)
-      return Home(**home_res)
-    else:
-      raise HTTPException(401, "Not the creator")
+    homes = [Home(**h) async for h in home_res]
+    if len(homes) == 0:
+      raise HTTPException(404)
+    
+    home = homes[0]
+    home.name = home.name if homeUpdate.name == None else homeUpdate.name
+    return Home(**await container_homes.upsert_item(home.__dict__))
+
 
 async def get_homes(user: user.User):
   async with db.get_client() as client:
@@ -67,13 +76,14 @@ async def get_homes(user: user.User):
 
     res = container.query_items(
       """
-      SELECT c.name
-      from c
-      WHERE ARRAY_CONTAINS (c['residents'], @username)
+      SELECT h.name
+      from homes h
+      WHERE ARRAY_CONTAINS (h['residents'], @username)
       """,
       parameters=[{"name": "@username", "value": user.username}])  
 
-    return [Home(**r) async for r in res]
+    res2 = [r["name"] async for r in res]
+    return res2
   
 async def get_home(id: str):
   async with db.get_client() as client:
