@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from lib.db.db import get_or_create_container, get_client
 from lib.auth.auth import pwd_context
+import re
 
 
 class User(BaseModel):
@@ -11,6 +12,10 @@ class User(BaseModel):
     first_name: str
     surname: str
     disabled: bool
+
+    @staticmethod
+    def username_valid(username: str):
+        return re.search("[\\d\\w\\-_]{7,15}", username) is not None
 
 
 class UserIn(BaseModel):
