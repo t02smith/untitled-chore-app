@@ -17,6 +17,10 @@ class User(BaseModel):
     def username_valid(username: str):
         return re.search("[\\d\\w\\-_]{7,15}", username) is not None
 
+    @staticmethod
+    def email_valid(email: str):
+        return re.search("^[\\w\\-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", email)
+
 
 class UserIn(BaseModel):
     username: str
@@ -57,16 +61,31 @@ async def get_user_by_username(username: str) -> User | None:
 async def register_user(user: UserIn):
     async with get_client() as client:
         container = await get_or_create_container(client, "users")
-        await container.create_item(
-            {
-                "username": user.username,
-                "password": pwd_context.hash(user.password),
-                "first_name": user.first_name,
-                "surname": user.surname,
-                "email": user.email,
-                "disabled": False,
-            },
-            enable_automatic_id_generation=True,
+
+        user_exists = container.query_items(
+            """
+          SELECT u.id
+          FROM users u
+          WHERE u.email=@email OR u.username=@username
+          """,
+            paramters=[
+                {"name": "@username", "value": user.username},
+                {"name": "@email", "value": user.email},
+            ],
+        )
+
+        res = UserOut(
+            **await container.create_item(
+                {
+                    "username": user.username,
+                    "password": pwd_context.hash(user.password),
+                    "first_name": user.first_name,
+                    "surname": user.surname,
+                    "email": user.email,
+                    "disabled": False,
+                },
+                enable_automatic_id_generation=True,
+            )
         )
 
 

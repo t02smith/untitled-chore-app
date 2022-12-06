@@ -33,17 +33,3 @@ async def get_timetable(home_id: str, user: User = Depends(get_current_active_us
 )
 async def new_timetable(home_id: str, user: User = Depends(get_current_active_user)):
     return ""
-
-
-@router.post("/invite")
-async def create_invite_link(
-    home_id: str, user: User = Depends(get_current_active_user)
-):
-    await home.create_invite_link(home_id, user)
-
-
-@router.get("/join/{invite_id}")
-async def join_home_via_invite_link(
-    invite_id: str, user: User = Depends(get_current_active_user)
-):
-    pass

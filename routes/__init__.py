@@ -6,6 +6,7 @@ from lib.db.user import UserIn, User, register_user
 from lib.auth import tokens, user as userAuth, auth
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
+from lib import err
 
 
 router = APIRouter(prefix="/api/v1")
@@ -19,10 +20,11 @@ router.include_router(timetable.router)
     "/login",
     response_model=tokens.Token,
     description="Login using an existing account to untitled-chore-api",
+    tags=["user"],
     status_code=201,
     responses={
-        401: {"message": "Incorrect username or password"},
-        400: {"message": "Invalid username or password"},
+        400: {"message": "Invalid username or password", "model": err.HTTPError},
+        401: {"message": "Incorrect username or password", "model": err.HTTPError},
     },
 )
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -50,10 +52,24 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 @router.post(
     "/register",
     response_model=tokens.Token,
+    description="Register a new user to untitled-chore-api",
     tags=["user"],
+    status_code=201,
+    responses={
+        400: {
+            "message": "Invalid user details or user already exists",
+            "model": err.HTTPError,
+        }
+    },
 )
 async def register(userInfo: UserIn):
     # ? check format for username, password, email
+    if not all(
+        [User.username_valid(userInfo.username), User.email_valid(userInfo.email)]
+    ):
+        raise HTTPException(
+            400, detail="Invalid format for username, email or password"
+        )
 
     # ? create new user
     await register_user(userInfo)

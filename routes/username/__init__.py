@@ -2,8 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from lib.auth.user import get_current_active_user
 from lib.db import chores, user as userDB
 from typing import List
+from routes.username import house
 
 router = APIRouter(prefix="/{username}")
+
+router.include_router(house.router)
 
 
 @router.get("/")
