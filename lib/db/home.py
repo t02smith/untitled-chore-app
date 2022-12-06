@@ -60,3 +60,36 @@ async def update_home(home: HomeUpdate, id: str, user: user.User):
       return Home(**home_res)
     else:
       raise HTTPException(401, "Not the creator")
+
+async def get_homes(user: user.User):
+  async with db.get_client() as client:
+    container = await db.get_or_create_container(client, "homes")
+
+    res = container.query_items(
+      """
+      SELECT c.name
+      from c
+      WHERE ARRAY_CONTAINS (c['residents'], @username)
+      """,
+      parameters=[{"name": "@username", "value": user.username}])  
+
+    return [Home(**r) async for r in res]
+  
+async def get_home(id: str):
+  async with db.get_client() as client:
+    container = await db.get_or_create_container(client, "homes")
+
+    res = await container.read_item(id, partition_key=id)
+    
+    return Home(**res)
+
+async def delete_home(id: str, user: user.User):
+  async with db.get_client() as client:
+    container = await db.get_or_create_container(client, "homes")
+
+    res = await container.read_item(id, partition_key=id)
+    
+    if (res["creator"] == user.username):
+      await container.delete_item(id, partition_key=id)
+    else:
+      raise HTTPException(401, "Not the creator")
