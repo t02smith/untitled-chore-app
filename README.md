@@ -12,12 +12,36 @@
 > You need Poetry for this. [Download from here.](https://python-poetry.org/docs/#installation)
 
 ```bash
+# installs the dependencies - does not reinstall poetry
 poetry install
+
+# activates the venv (JARET DO THIS STEP)
 poetry shell
+
+# runs the python app 
+# PYTHON not POETRY
+python main.py
+```
+
+### Venv
+
+```bash
+# creates new virtual environment
+python -m venv .venv
+
+# actives that venv
+./.venv/Scripts/activate
+
+# downloads all the dependencies
+pip install -r requirements.txt
+
+# runs the python app
 python main.py
 ```
 
 ### Docker
+
+IGNORE THIS
 
 > You need Docker for this. [Download from here.](https://www.docker.com/)\
 > *For deployment*
@@ -25,15 +49,6 @@ python main.py
 ```bash
 docker build -t untitled-chore-app .
 docker run -p 80:80 untitled-chore-app
-```
-
-### Venv
-
-```bash
-python -m venv .venv
-./.venv/Scripts/activate
-pip install -r requirements.txt
-python main.py
 ```
 
 ## Testing
