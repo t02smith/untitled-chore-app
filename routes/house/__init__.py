@@ -9,8 +9,7 @@ router = APIRouter(prefix="/house")
 @router.post(
   "/",
   description="Create a new home",
-  response_model=home.Home,
-  tags="house"
+  tags=["house"]
 )
 async def create_home(
     newhome: home.HomeIn, user: User = Depends(get_current_active_user)
@@ -20,8 +19,7 @@ async def create_home(
 @router.put(
   "/",
   description="Update an existing house",
-  response_model=home.Home,
-  tags="house"
+  tags=["house"]
 )
 async def update_home(
   id: str, newHome: home.HomeIn, user: User = Depends(get_current_active_user)
@@ -31,8 +29,7 @@ async def update_home(
 @router.get(
   "/",
   description="Get the homes that contain a certain user",
-  response_model=[home.Home],
-  tags="house"
+  tags=["house"]
 )
 async def get_homes(user: User = Depends(get_current_active_user)):
   return await home.get_homes(user)
@@ -40,8 +37,7 @@ async def get_homes(user: User = Depends(get_current_active_user)):
 @router.get(
   "/",
   description="Get a home by id",
-  response_model=home.Home,
-  tags="house"
+  tags=["house"]
 )
 async def get_home(id: str, user: User = Depends(get_current_active_user)):
   return await home.get_homes(id)
@@ -49,8 +45,7 @@ async def get_home(id: str, user: User = Depends(get_current_active_user)):
 @router.delete(
   "/",
   description="Delete a house by id. Only the creator of the house can do this",
-  response_model=home.Home,
-  tags="house"
+  tags=["house"]
 )
 async def delete_home(id: str, user: User = Depends(get_current_active_user)):
   return await home.delete_home(id, user)
