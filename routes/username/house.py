@@ -1,22 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
-from lib.db import user as userDB, home
+from lib.db import user as userDB, home, chores
 from lib.auth import user as userAuth
 from lib import err
+from typing import List
 
 router = APIRouter(prefix="/{house_name}")
-
-
-@router.put("/", description="Update an existing house", tags=["house"])
-async def update_home(
-    username: str,
-    house_name: str,
-    newHome: home.HomeIn,
-    user: userDB.User = Depends(userAuth.get_current_active_user),
-):
-    if username != user.username:
-        raise HTTPException(403)
-
-    return await home.update_home(newHome, username, house_name, user)
 
 
 @router.get("/")
@@ -29,11 +17,58 @@ async def get_home_timetable():
     pass
 
 
+@router.put("/", description="Update an existing house", tags=["home"])
+async def update_home(
+    username: str,
+    house_name: str,
+    newHome: home.HomeIn,
+    user: userDB.User = Depends(userAuth.get_current_active_user),
+):
+    if username != user.username:
+        raise HTTPException(403)
+
+    return await home.update_home(newHome, username, house_name, user)
+
+
+# ! CHORES
+
+
+@router.get(
+    "/chores",
+    description="Get a list of chores by house",
+    summary="Get a list of chores by house",
+    tags=["home"],
+    response_model=List[chores.Chore],
+    status_code=200,
+    responses={
+        404: {"message": "house not found", "model": err.HTTPError},
+        403: {"message": "user not in house", "model": err.HTTPError},
+    },
+)
+async def get_house_chores(
+    username: str,
+    house_name: str,
+    user: userDB.User = Depends(userAuth.get_current_active_user),
+):
+    house = await home.get_home_by_creator_and_name(username, house_name)
+    if house is None:
+        raise HTTPException(404)
+
+    if user.username not in house.residents:
+        raise HTTPException(403)
+
+    return house.chores
+
+
+# ! INVITES
+
+
 @router.post(
     "/invite",
     description="Creates a temporary invite link for your home",
     status_code=201,
     tags=["user", "home"],
+    response_model=home.HomeInvite,
     responses={
         403: {"message": "Not authorized to make a link", "model": err.HTTPError},
         404: {"message": "Home not found", "model": err.HTTPError},
@@ -47,7 +82,7 @@ async def create_invite_link(
     if username != user.username:
         raise HTTPException(403)
 
-    return f"{await home.create_invite_link(username, house_name, user)}"
+    return await home.create_invite_link(username, house_name, user)
 
 
 @router.get(
@@ -69,5 +104,5 @@ async def join_home_via_invite_link(
     invite_id: str,
     user: userDB.User = Depends(userAuth.get_current_active_user),
 ):
-    await home.join_home_via_invite_link(invite_id, user)
+    await home.join_home_via_invite_link(username, house_name, invite_id, user)
     return "Joined home successfully"

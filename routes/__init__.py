@@ -20,7 +20,7 @@ router.include_router(timetable.router)
     "/login",
     response_model=tokens.Token,
     description="Login using an existing account to untitled-chore-api",
-    tags=["user"],
+    tags=["user", "auth"],
     status_code=201,
     responses={
         400: {"message": "Invalid username or password", "model": err.HTTPError},
@@ -53,7 +53,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     "/register",
     response_model=tokens.Token,
     description="Register a new user to untitled-chore-api",
-    tags=["user"],
+    tags=["user", "auth"],
     status_code=201,
     responses={
         400: {

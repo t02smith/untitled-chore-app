@@ -1,6 +1,10 @@
+from fastapi import HTTPException
 from lib.db import user, db
 from typing import List
 from pydantic import BaseModel
+from datetime import datetime, timedelta
+from random import randint
+from hashlib import sha1
 
 # ! CLASSES
 
@@ -18,6 +22,14 @@ class Home(BaseModel):
     creator: str
     invite_link: HomeInvite | None = None
 
+    def to_json(self):
+        dic = self.__dict__
+        dic["invite_link"] = (
+            None if self.invite_link is None else self.invite_link.__dict__
+        )
+
+        return dic
+
 
 class HomeIn(BaseModel):
     name: str
@@ -33,24 +45,33 @@ class HomeUpdate(BaseModel):
 
 
 async def get_home_by_creator_and_name(
-    container, creator: str, name: str
+    creator: str, name: str, container=None
 ) -> Home | None:
-    res = [
-        Home(**h)
-        async for h in container.query_items(
-            """
-    SELECT TOP 1 *
-    FROM homes h
-    WHERE h.name=@name AND h.creator=@creator
-    """,
-            parameters=[
-                {"name": "@name", "value": name},
-                {"name": "@creator", "value": creator},
-            ],
-        )
-    ]
+    async def func():
 
-    return None if len(res) == 0 else res[0]
+        res = [
+            Home(**h)
+            async for h in container.query_items(
+                """
+      SELECT TOP 1 *
+      FROM homes h
+      WHERE h.name=@name AND h.creator=@creator
+      """,
+                parameters=[
+                    {"name": "@name", "value": name},
+                    {"name": "@creator", "value": creator},
+                ],
+            )
+        ]
+
+        return None if len(res) == 0 else res[0]
+
+    if container is not None:
+        return await func()
+    else:
+        async with db.get_client() as client:
+            container = await db.get_or_create_container(client, "homes")
+            return await func()
 
 
 # ! OTHER
@@ -79,6 +100,7 @@ async def create_home(home: HomeIn, user: user.User):
                 "residents": res,
                 "chores": [] if home.chores is None else home.chores,
                 "creator": user.username,
+                "invite_link": None,
             },
             enable_automatic_id_generation=True,
         )
@@ -92,7 +114,6 @@ async def update_home(
     async with db.get_client() as client:
         container_homes = await db.get_or_create_container(client, "homes")
 
-        # home_res = await container_homes.read_item(id, partition_key=id)
         home_res = container_homes.query_items(
             """
       SELECT * 
@@ -152,28 +173,9 @@ async def delete_home(id: str, user: user.User):
             raise HTTPException(401, "Not the creator")
 
 
-async def register_home(home: HomeIn, creator: str):
-    async with db.get_client() as client:
-        container = await db.get_or_create_container(client, "homes")
-
-        if home.residents is None:
-            home.residents = []
-
-        home.residents.append(creator)
-        await container.create_item(
-            {
-                "name": home.name,
-                "residents": home.residents,
-                "chores": [] if home.chores is None else home.chores,
-                "creator": creator,
-            },
-            enable_automatic_id_generation=True,
-        )
-
-
 async def create_invite_link(
     creator: str, house_name: str, user: user.User, link_alive_time_hours: int = 24
-):
+) -> HomeInvite:
     async with db.get_client() as client:
         container = await db.get_or_create_container(client, "homes")
 
@@ -186,7 +188,7 @@ async def create_invite_link(
             home.invite_link is not None
             and datetime.now().isoformat() < home.invite_link.expiry
         ):
-            return home.invite_link.id
+            return home.invite_link
 
         # generate required link values
         nonce = randint(0, 100000000000000000000)
@@ -205,8 +207,8 @@ async def create_invite_link(
         dic["invite_link"] = home.invite_link.__dict__
 
         await container.upsert_item(dic)
-
-        return home.invite_link.id
+        print(home.invite_link)
+        return home.invite_link
 
 
 async def join_home_via_invite_link(
@@ -234,9 +236,10 @@ async def join_home_via_invite_link(
 
         home: Home = awaited_homes[0]
         if home.invite_link.expiry < datetime.now().isoformat():
-            raise HTTPException(400, detail="Invalid invite link")
+            raise HTTPException(400, detail="Expired invite link")
 
         if user.username in home.residents:
             raise HTTPException(400, detail="You are already in this home")
 
         home.residents.append(user.username)
+        await container.upsert_item(home.to_json())

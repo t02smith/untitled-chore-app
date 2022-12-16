@@ -42,6 +42,9 @@ class UserOut(BaseModel):
     first_name: str
     surname: str
 
+class UserOutPublic(BaseModel):
+  username: str
+  first_name: str
 
 async def get_user_by_username(username: str) -> User | None:
     async with get_client() as client:
