@@ -1,52 +1,10 @@
 from pydantic import BaseModel
 from lib.db.db import get_or_create_container, get_client
+from lib.db import types
 from lib.auth.auth import pwd_context
-import re
 
 
-class User(BaseModel):
-    id: str
-    username: str
-    password: str
-    email: str
-    first_name: str
-    surname: str
-    disabled: bool
-
-    @staticmethod
-    def username_valid(username: str):
-        return re.search("[\\d\\w\\-_]{7,15}", username) is not None
-
-    @staticmethod
-    def email_valid(email: str):
-        return re.search("^[\\w\\-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", email)
-
-
-class UserIn(BaseModel):
-    username: str
-    password: str
-    email: str
-    first_name: str
-    surname: str
-
-
-class UserUpdate(BaseModel):
-    password: str | None = None
-    first_name: str | None = None
-    surname: str | None = None
-
-
-class UserOut(BaseModel):
-    username: str
-    email: str
-    first_name: str
-    surname: str
-
-class UserOutPublic(BaseModel):
-  username: str
-  first_name: str
-
-async def get_user_by_username(username: str) -> User | None:
+async def get_user_by_username(username: str) -> types.User | None:
     async with get_client() as client:
         container = await get_or_create_container(client, "users")
 
@@ -58,10 +16,10 @@ async def get_user_by_username(username: str) -> User | None:
         if len(items) == 0:
             return None
 
-        return User(**items[0])
+        return types.User(**items[0])
 
 
-async def register_user(user: UserIn):
+async def register_user(user: types.UserIn):
     async with get_client() as client:
         container = await get_or_create_container(client, "users")
 
@@ -77,7 +35,7 @@ async def register_user(user: UserIn):
             ],
         )
 
-        res = UserOut(
+        res = types.UserOut(
             **await container.create_item(
                 {
                     "username": user.username,
@@ -92,10 +50,10 @@ async def register_user(user: UserIn):
         )
 
 
-async def update_user(old, updated: UserUpdate) -> UserOut:
+async def update_user(old, updated: types.UserUpdate) -> types.UserOut:
     async with get_client() as client:
         container = await get_or_create_container(client, "users")
-        return UserOut(
+        return types.UserOut(
             **await container.upsert_item(
                 {
                     "id": old.id,

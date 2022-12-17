@@ -1,52 +1,14 @@
 from fastapi import HTTPException
-from lib.db import user, db
-from typing import List
+from lib.db import user, db, types
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 from random import randint
 from hashlib import sha1
 
-# ! CLASSES
-
-
-class HomeInvite(BaseModel):
-    id: str
-    expiry: str
-
-
-class Home(BaseModel):
-    id: str
-    name: str
-    residents: List[str]
-    chores: List[str]
-    creator: str
-    invite_link: HomeInvite | None = None
-
-    def to_json(self):
-        dic = self.__dict__
-        dic["invite_link"] = (
-            None if self.invite_link is None else self.invite_link.__dict__
-        )
-
-        return dic
-
-
-class HomeIn(BaseModel):
-    name: str
-    residents: List[str] | None = None
-    chores: List[str] | None = None
-
-
-class HomeUpdate(BaseModel):
-    name: str | None = None
-
-
-# ! HELPER
-
 
 async def get_home_by_creator_and_name(
     creator: str, name: str, container=None
-) -> Home | None:
+) -> types.Home | None:
     async def func():
 
         res = [
@@ -74,10 +36,7 @@ async def get_home_by_creator_and_name(
             return await func()
 
 
-# ! OTHER
-
-
-async def create_home(home: HomeIn, user: user.User):
+async def create_home(home: types.HomeIn, user: types.User):
     async with db.get_client() as client:
         container_homes = await db.get_or_create_container(client, "homes")
         container_users = await db.get_or_create_container(client, "users")
@@ -109,7 +68,7 @@ async def create_home(home: HomeIn, user: user.User):
 
 
 async def update_home(
-    homeUpdate: HomeUpdate, creator: str, house_name: str, user: user.User
+    homeUpdate: types.HomeUpdate, creator: str, house_name: str, user: types.User
 ):
     async with db.get_client() as client:
         container_homes = await db.get_or_create_container(client, "homes")
@@ -126,16 +85,16 @@ async def update_home(
             ],
         )
 
-        homes = [Home(**h) async for h in home_res]
+        homes = [types.Home(**h) async for h in home_res]
         if len(homes) == 0:
             raise HTTPException(404)
 
         home = homes[0]
         home.name = home.name if homeUpdate.name == None else homeUpdate.name
-        return Home(**await container_homes.upsert_item(home.__dict__))
+        return types.Home(**await container_homes.upsert_item(home.__dict__))
 
 
-async def get_homes(user: user.User):
+async def get_homes(user: types.User):
     async with db.get_client() as client:
         container = await db.get_or_create_container(client, "homes")
 
@@ -152,16 +111,7 @@ async def get_homes(user: user.User):
         return res2
 
 
-async def get_home(id: str):
-    async with db.get_client() as client:
-        container = await db.get_or_create_container(client, "homes")
-
-        res = await container.read_item(id, partition_key=id)
-
-        return Home(**res)
-
-
-async def delete_home(id: str, user: user.User):
+async def delete_home(id: str, user: types.User):
     async with db.get_client() as client:
         container = await db.get_or_create_container(client, "homes")
 
@@ -174,8 +124,8 @@ async def delete_home(id: str, user: user.User):
 
 
 async def create_invite_link(
-    creator: str, house_name: str, user: user.User, link_alive_time_hours: int = 24
-) -> HomeInvite:
+    creator: str, house_name: str, user: types.User, link_alive_time_hours: int = 24
+) -> types.HomeInvite:
     async with db.get_client() as client:
         container = await db.get_or_create_container(client, "homes")
 
@@ -202,7 +152,7 @@ async def create_invite_link(
         hasher.update(created_at.isoformat().encode())
         hasher.update(home.id.encode())
 
-        home.invite_link = HomeInvite(id=hasher.hexdigest(), expiry=expiry)
+        home.invite_link = types.HomeInvite(id=hasher.hexdigest(), expiry=expiry)
         dic = home.__dict__
         dic["invite_link"] = home.invite_link.__dict__
 
@@ -212,7 +162,7 @@ async def create_invite_link(
 
 
 async def join_home_via_invite_link(
-    home_creator: str, home_name: str, invite_id: str, user: user.User
+    home_creator: str, home_name: str, invite_id: str, user: types.User
 ):
     async with db.get_client() as client:
         container = await db.get_or_create_container(client, "homes")
@@ -230,7 +180,7 @@ async def join_home_via_invite_link(
             ],
         )
 
-        awaited_homes = [Home(**h) async for h in homes]
+        awaited_homes = [types.Home(**h) async for h in homes]
         if len(awaited_homes) == 0:
             raise HTTPException(404, detail="Invite link not found")
 

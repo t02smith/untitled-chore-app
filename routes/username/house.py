@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from lib.db import user as userDB, home, chores
+from lib.db import user as userDB, home, chores, timetable, types
 from lib.auth import user as userAuth
 from lib import err
 from typing import List
@@ -21,8 +21,8 @@ async def get_home_timetable():
 async def update_home(
     username: str,
     house_name: str,
-    newHome: home.HomeIn,
-    user: userDB.User = Depends(userAuth.get_current_active_user),
+    newHome: types.HomeIn,
+    user: types.User = Depends(userAuth.get_current_active_user),
 ):
     if username != user.username:
         raise HTTPException(403)
@@ -38,7 +38,7 @@ async def update_home(
     description="Get a list of chores by house",
     summary="Get a list of chores by house",
     tags=["home"],
-    response_model=List[chores.Chore],
+    response_model=List[types.Chore],
     status_code=200,
     responses={
         404: {"message": "house not found", "model": err.HTTPError},
@@ -48,7 +48,7 @@ async def update_home(
 async def get_house_chores(
     username: str,
     house_name: str,
-    user: userDB.User = Depends(userAuth.get_current_active_user),
+    user: types.User = Depends(userAuth.get_current_active_user),
 ):
     house = await home.get_home_by_creator_and_name(username, house_name)
     if house is None:
@@ -68,7 +68,7 @@ async def get_house_chores(
     description="Creates a temporary invite link for your home",
     status_code=201,
     tags=["user", "home"],
-    response_model=home.HomeInvite,
+    response_model=types.HomeInvite,
     responses={
         403: {"message": "Not authorized to make a link", "model": err.HTTPError},
         404: {"message": "Home not found", "model": err.HTTPError},
@@ -77,7 +77,7 @@ async def get_house_chores(
 async def create_invite_link(
     username: str,
     house_name: str,
-    user: userDB.User = Depends(userAuth.get_current_active_user),
+    user: types.User = Depends(userAuth.get_current_active_user),
 ):
     if username != user.username:
         raise HTTPException(403)
@@ -102,7 +102,27 @@ async def join_home_via_invite_link(
     username: str,
     house_name: str,
     invite_id: str,
-    user: userDB.User = Depends(userAuth.get_current_active_user),
+    user: types.User = Depends(userAuth.get_current_active_user),
 ):
     await home.join_home_via_invite_link(username, house_name, invite_id, user)
     return "Joined home successfully"
+
+
+# ! TIMETABLE
+
+
+@router.get(
+    "/timetable",
+    summary="Get this week's timetable for a given house",
+    status_code=200,
+    tags=["home"],
+)
+async def get_or_generate_timetable(
+    username: str,
+    house_name: str,
+    user: types.User = Depends(userAuth.get_current_active_user),
+):
+    # return await timetable.get_or_generate_timetable(
+    #     username, house_name, user.username
+    # )
+    pass

@@ -1,7 +1,6 @@
 from fastapi import Depends
-from lib.db import user as userDB
+from lib.db import user as userDB, types
 from fastapi import HTTPException
-from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from lib.auth import tokens, auth
 
@@ -29,7 +28,7 @@ async def get_current_user(token: str = Depends(auth.oauth2_scheme)):
 
 
 async def get_current_active_user(
-    current_user: userDB.User = Depends(get_current_user),
+    current_user: types.User = Depends(get_current_user),
 ):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")

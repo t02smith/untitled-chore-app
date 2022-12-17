@@ -3,7 +3,6 @@ from routes import router
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 import uvicorn
-import logging
 
 app = FastAPI(
     title="Untitled Chore API",

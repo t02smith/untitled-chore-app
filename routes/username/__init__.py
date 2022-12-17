@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from lib.auth.user import get_current_active_user
-from lib.db import chores, user as userDB
+from lib.db import chores, user as userDB, types
 from lib import err, io
 from typing import List
 from routes.username import house
@@ -14,19 +14,21 @@ router.include_router(house.router)
     "/",
     description="Gets information about a user",
     tags=["user"],
-    response_model=userDB.UserOut | userDB.UserOutPublic,
+    response_model=types.UserOut,
     status_code=200,
     responses={404: {"message": "user not found", "model": err.HTTPError}},
 )
 async def get_user_info(
-    username: str, user: userDB.User = Depends(get_current_active_user)
+    username: str, user: types.User = Depends(get_current_active_user)
 ):
     if user.username != username:
         userLookup = await userDB.get_user_by_username(username)
         if userLookup is None:
             raise HTTPException(404)
 
-        return userDB.UserOutPublic(**userLookup.__dict__)
+        return types.UserOut(
+            username=userLookup.username, first_name=userLookup.first_name
+        )
 
     return userDB.UserOut(**user.__dict__)
 
@@ -35,7 +37,7 @@ async def get_user_info(
     "/",
     description="Update a user's information",
     tags=["user"],
-    response_model=userDB.UserOut,
+    response_model=types.UserOut,
     status_code=200,
     responses={
         403: {
@@ -46,8 +48,8 @@ async def get_user_info(
 )
 async def update_user_info(
     username: str,
-    updated: userDB.UserUpdate,
-    user: userDB.User = Depends(get_current_active_user),
+    updated: types.UserUpdate,
+    user: types.User = Depends(get_current_active_user),
 ):
     if username != user.username:
         raise HTTPException(403)
@@ -59,12 +61,12 @@ async def update_user_info(
     "/chores",
     description="Get a list of chores created by a user",
     tags=["chores", "user"],
-    response_model=List[chores.Chore],
+    response_model=List[types.Chore],
     status_code=200,
     responses={404: {"message": "User not found", "model": err.HTTPError}},
 )
 async def get_user_chores(
-    username: str, user: userDB.User = Depends(get_current_active_user)
+    username: str, user: types.User = Depends(get_current_active_user)
 ):
     if await userDB.get_user_by_username(username) is None:
         raise HTTPException(404)
@@ -77,14 +79,14 @@ async def get_user_chores(
     description="Returns the user's timetable that includes every household.",
 )
 async def get_user_timetable(
-    username, user: userDB.User = Depends(get_current_active_user)
+    username, user: types.User = Depends(get_current_active_user)
 ):
     return "timetable"
 
 
 @router.post("/timetable/upload", description="Upload your university timetable")
 async def upload_timetable(
-    url: str, user: userDB.User = Depends(get_current_active_user)
+    url: str, user: types.User = Depends(get_current_active_user)
 ):
     if not re.search("https:\/\/timetable\.soton\.ac\.uk\/Feed\/Index\/.*", url):
         raise HTTPException(400, detail="Invalid URL")

@@ -1,24 +1,8 @@
 from pydantic import BaseModel
-from lib.db import db, user
+from lib.db import db, user, types
 
 
-class Chore(BaseModel):
-    id: str
-    author: str
-    name: str
-    expected_time: int
-    description: str
-    public: bool
-
-
-class ChoreIn(BaseModel):
-    name: str
-    expected_time: int
-    description: str
-    public: bool
-
-
-async def create_chore(chore: ChoreIn, user: user.User) -> Chore:
+async def create_chore(chore: types.ChoreIn, user: types.User) -> types.Chore:
     async with db.get_client() as client:
         container = await db.get_or_create_container(client, "chores")
         chore = await container.create_item(
@@ -32,7 +16,7 @@ async def create_chore(chore: ChoreIn, user: user.User) -> Chore:
             enable_automatic_id_generation=True,
         )
 
-        return Chore(**chore)
+        return types.Chore(**chore)
 
 
 async def get_chores_from_user(username: str, include_private: bool = False):
@@ -47,10 +31,10 @@ async def get_chores_from_user(username: str, include_private: bool = False):
             parameters=[{"name": "@username", "value": username}],
         )
 
-        return [Chore(**c) async for c in chores_res]
+        return [types.Chore(**c) async for c in chores_res]
 
 
-async def get_chore_by_id(id: str, username: str) -> Chore:
+async def get_chore_by_id(id: str, username: str) -> types.Chore:
     async with db.get_client() as client:
         container = await db.get_or_create_container(client, "chores")
         chores_res = container.query_items(
@@ -65,10 +49,10 @@ async def get_chore_by_id(id: str, username: str) -> Chore:
             ],
         )
 
-        return [Chore(**c) async for c in chores_res][0]
+        return [types.Chore(**c) async for c in chores_res][0]
 
 
-async def update_chore(id: str, chore: ChoreIn, username: str):
+async def update_chore(id: str, chore: types.ChoreIn, username: str):
     async with db.get_client() as client:
         container = await db.get_or_create_container(client, "chores")
         old = await get_chore_by_id(id, username)
@@ -88,4 +72,4 @@ async def update_chore(id: str, chore: ChoreIn, username: str):
             }
         )
 
-        return Chore(**res)
+        return types.Chore(**res)

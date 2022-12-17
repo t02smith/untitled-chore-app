@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from routes import chores, house, username, timetable
+from lib.db import types, db, user
 from lib.auth.user import get_current_active_user
-from lib.db.db import get_or_create_database
-from lib.db.user import UserIn, User, register_user
 from lib.auth import tokens, user as userAuth, auth
 from fastapi.security import OAuth2PasswordRequestForm
-from datetime import datetime, timedelta
+from datetime import timedelta
 from lib import err
 
 
@@ -62,7 +61,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         }
     },
 )
-async def register(userInfo: UserIn):
+async def register(userInfo: types.UserIn):
     # ? check format for username, password, email
     if not all(
         [User.username_valid(userInfo.username), User.email_valid(userInfo.email)]
@@ -72,7 +71,7 @@ async def register(userInfo: UserIn):
         )
 
     # ? create new user
-    await register_user(userInfo)
+    await user.register_user(userInfo)
 
     # * check access token
     access_token_Expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
