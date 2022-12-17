@@ -27,7 +27,7 @@ router.include_router(timetable.router)
     },
 )
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    if not User.username_valid(form_data.username):
+    if not types.User.username_valid(form_data.username):
         raise HTTPException(
             400,
             detail="Invalid username or password",

@@ -7,9 +7,9 @@ from typing import List
 router = APIRouter(prefix="/{house_name}")
 
 
-@router.get("/")
-async def get_home(username: str, house_name: str):
-    pass
+@router.get("/", tags=["house"])
+async def get_home(username: str, house_name: str, user: types.User = Depends(userAuth.get_current_active_user)):
+    return await home.get_home_by_creator_and_name(username, house_name, user)
 
 
 @router.get("/timetable")

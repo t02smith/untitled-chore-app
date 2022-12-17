@@ -2,22 +2,22 @@ from pydantic import BaseModel
 from lib.db.db import get_or_create_container, get_client
 from lib.db import types
 from lib.auth.auth import pwd_context
-
+from typing import List
 
 async def get_user_by_username(username: str) -> types.User | None:
-    async with get_client() as client:
-        container = await get_or_create_container(client, "users")
+    res = await get_users_by_username_from_list([username])
+    return None if len(res) == 0 else res[0]
 
-        res = container.query_items(
-            query="SELECT TOP 1 * FROM users u WHERE u.username=@username",
-            parameters=[{"name": "@username", "value": username}],
-        )
-        items = [item async for item in res]
-        if len(items) == 0:
-            return None
-
-        return types.User(**items[0])
-
+async def get_users_by_username_from_list(usernames: List[str]) -> List[types.User]:
+  async with get_client() as client:
+    container = await get_or_create_container(client, "users")
+    return [types.User(**u) async for u in container.query_items(
+      """
+      SELECT *
+      FROM users u
+      WHERE ARRAY_CONTAINS(@usernames, u.username)
+      """, parameters=[{"name": "@usernames", "value": usernames}]
+    )]
 
 async def register_user(user: types.UserIn):
     async with get_client() as client:

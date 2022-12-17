@@ -1,39 +1,79 @@
 from fastapi import HTTPException
-from lib.db import user, db, types
+from lib.db import user, db, types, chores
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 from random import randint
 from hashlib import sha1
 
+# * GETTERS
+
 
 async def get_home_by_creator_and_name(
-    creator: str, name: str, container=None
-) -> types.Home | None:
-    async def func():
-
-        res = [
-            Home(**h)
-            async for h in container.query_items(
-                """
+    creator: str,
+    house_name: str,
+    caller: types.User,
+    fetch_chores_and_residents: bool = False,
+) -> types.Home | types.HomeFull:
+  async with db.get_client() as client:
+    home_container = await db.get_or_create_container(client, "homes")
+    home_query_res = [h async for h in home_container.query_items("""
       SELECT TOP 1 *
       FROM homes h
-      WHERE h.name=@name AND h.creator=@creator
-      """,
-                parameters=[
-                    {"name": "@name", "value": name},
-                    {"name": "@creator", "value": creator},
-                ],
-            )
-        ]
+      WHERE h.name=@home_name AND h.creator=@creator
+      """, 
+      parameters=[{"name": "@home_name", "value": house_name},
+                  {"name": "@creator", "value": creator}])]
+    
+    if len(home_query_res) == 0:
+      raise HTTPException(404)
+    
+    home = types.Home(**home_query_res[0])
+    if caller.username != home.creator or caller.username not in home.residents:
+      raise HTTPException(403)
+    
+    if not fetch_chores_and_residents:
+      return home
+    
+    return types.HomeFull(
+      id=home.id, 
+      name=home.name,
+      creator=home.creator,
+      residents=await user.get_users_by_username_from_list(home.residents),
+      chores=await chores.get_chores_by_id_from_list(home.chores),
+      timetable=home.timetable,
+      invite_link=home.invite_link
+    )
 
-        return None if len(res) == 0 else res[0]
 
-    if container is not None:
-        return await func()
-    else:
-        async with db.get_client() as client:
-            container = await db.get_or_create_container(client, "homes")
-            return await func()
+
+# async def get_home_by_creator_and_name(
+#     creator: str, name: str, container=None
+# ) -> types.Home | None:
+#     async def func():
+
+#         res = [
+#             Home(**h)
+#             async for h in container.query_items(
+#                 """
+#       SELECT TOP 1 *
+#       FROM homes h
+#       WHERE h.name=@name AND h.creator=@creator
+#       """,
+#                 parameters=[
+#                     {"name": "@name", "value": name},
+#                     {"name": "@creator", "value": creator},
+#                 ],
+#             )
+#         ]
+
+#         return None if len(res) == 0 else res[0]
+
+#     if container is not None:
+#         return await func()
+#     else:
+#         async with db.get_client() as client:
+#             container = await db.get_or_create_container(client, "homes")
+#             return await func()
 
 
 async def create_home(home: types.HomeIn, user: types.User):

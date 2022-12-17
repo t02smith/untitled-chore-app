@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from lib.db import db, user, types
+from typing import List
 
 
 async def create_chore(chore: types.ChoreIn, user: types.User) -> types.Chore:
@@ -33,24 +34,24 @@ async def get_chores_from_user(username: str, include_private: bool = False):
 
         return [types.Chore(**c) async for c in chores_res]
 
-
-async def get_chore_by_id(id: str, username: str) -> types.Chore:
-    async with db.get_client() as client:
-        container = await db.get_or_create_container(client, "chores")
-        chores_res = container.query_items(
-            """
-            SELECT c.id, c.name, c.author, c.expected_time, c.description, c.public
-            FROM chores c
-            WHERE (c.author=@username OR c.public) AND c.id=@id
-          """,
-            parameters=[
-                {"name": "@username", "value": username},
-                {"name": "@id", "value": id},
-            ],
-        )
-
-        return [types.Chore(**c) async for c in chores_res][0]
-
+      
+async def get_chore_by_id(id: str) -> types.Chore | None:
+    res = await get_chores_by_id_from_list([id])
+    return None if len(res) == 0 else res[0]
+      
+      
+async def get_chores_by_id_from_list(chores: List[str]) -> List[types.Chore]:
+  async with db.get_client() as client:
+    container = await db.get_or_create_container(client, "chores")
+    return [types.Chore(**c) async for c in container.query_items(
+      """
+      SELECT *
+      FROM chores c
+      WHERE ARRAY_CONTAINS(@chores, c.id) 
+      """, parameters=[{"name": "@chores", "value": chores}]
+    )]
+    
+  
 
 async def update_chore(id: str, chore: types.ChoreIn, username: str):
     async with db.get_client() as client:

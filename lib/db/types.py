@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from typing import List
 from datetime import datetime
+import re
+from dataclasses import dataclass
 
 # ! USER
 
@@ -106,7 +108,7 @@ class Home(BaseModel):
     chores: List[str]
     creator: str
     invite_link: HomeInvite | None = None
-    timetable: Timetable
+    timetable: Timetable | None = None
 
     def to_json(self):
         dic = self.__dict__
@@ -116,15 +118,15 @@ class Home(BaseModel):
 
         return dic
 
-
+@dataclass
 class HomeFull:
     id: str
     name: str
     creator: str
     residents: List[User]
     chores: List[Chore]
-    timetable: Timetable
-    invite_link: HomeInvite
+    timetable: Timetable | None = None
+    invite_link: HomeInvite | None = None
 
 
 # ? Home IO classes

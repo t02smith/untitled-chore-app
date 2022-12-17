@@ -32,7 +32,7 @@ async def get_current_active_user(
 ):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
-    return userDB.User(**current_user.__dict__)
+    return types.User(**current_user.__dict__)
 
 
 # * passwords
