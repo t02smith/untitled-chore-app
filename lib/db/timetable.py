@@ -14,8 +14,8 @@ async def get_or_generate_timetable(home_creator: str, home_name: str, caller: t
     chore_objs = await chores.get_chores_by_id_from_list(home.chores)
     
     # ? generate new timetable
-    chores = sorted(chore_objs, key=lambda c: c.expected_time, reverse=True)
-    residents = list(map(lambda u: [u.username, 0], home.residents))
+    sorted_chores = sorted(chore_objs, key=lambda c: c.expected_time, reverse=True)
+    residents = list(map(lambda u: [u, 0], home.residents))
     timetable = types.Timetable(
       id="0",
       home_id=home.id, 
@@ -24,7 +24,7 @@ async def get_or_generate_timetable(home_creator: str, home_name: str, caller: t
       end=(datetime.now()+timedelta(days=7)).isoformat()
     )
       
-    for c in chores:
+    for c in sorted_chores:
       residents = sorted(residents, key=lambda u: u[1]) # TODO sort by chore score
       timetable.tasks.append(types.TimetabledChore(chore_id=c.id, user_id=residents[0][0]))
       residents[0][1] += c.expected_time
@@ -32,12 +32,19 @@ async def get_or_generate_timetable(home_creator: str, home_name: str, caller: t
     # ? write timetable to database
     async with db.get_client() as client:
       container = await db.get_or_create_container(client, "timetables")
+      
+      if existing_timetable is not None:
+        await container.delete_item(existing_timetable.id, existing_timetable.id)
+      
       return types.Timetable(**await container.create_item({
           "home_id": timetable.home_id,
           "start": timetable.start,
           "end": timetable.end,
           "tasks": list(map(lambda t: t.__dict__, timetable.tasks)) 
       }, enable_automatic_id_generation=True))
+      
+    # TODO remove old timetable from database
+      
       
 async def get_homes_timetable(home_id: str) -> types.Timetable | None:
   async with db.get_client() as client:
@@ -51,6 +58,7 @@ async def get_homes_timetable(home_id: str) -> types.Timetable | None:
     )]
     
     return None if len(res) == 0 else types.Timetable(**res[0])
+  
   
 async def get_users_timetable(user: types.User) -> types.UserTimetable:
   homes = await homeDB.get_users_homes(user)
@@ -70,6 +78,9 @@ async def get_users_timetable(user: types.User) -> types.UserTimetable:
     )
     
     for t in timetables:
-      userTimetables.tasks[t.home_id] = t.tasks
+      userTimetables.tasks[t.home_id] = list(map(
+        lambda task: types.UserTimetableChore(chore_id=task.chore_id, complete=task.complete), 
+        t.tasks
+      ))
       
     return userTimetables

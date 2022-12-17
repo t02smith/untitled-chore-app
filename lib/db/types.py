@@ -86,9 +86,15 @@ class Timetable(BaseModel):
     tasks: List[TimetabledChore]
     
     
+class UserTimetableChore(BaseModel):
+  chore_id: str
+  complete: bool
+    
 class UserTimetable(BaseModel):
   username: str
-  tasks: Dict[str, List[TimetabledChore]]
+  tasks: Dict[str, List[UserTimetableChore]]
+  
+
 
 
 # ! HOME

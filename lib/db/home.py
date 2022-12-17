@@ -71,7 +71,7 @@ async def create_home(home: types.HomeIn, user: types.User):
             enable_automatic_id_generation=True,
         )
 
-        return Home(**res)
+        return types.Home(**res)
 
 
 async def update_home(

@@ -13,7 +13,7 @@ router = APIRouter(prefix="/house")
 async def create_home(
     newhome: types.HomeIn, user: types.User = Depends(get_current_active_user)
 ):
-    return await home.create_home(newhome, user.username)
+    return await home.create_home(newhome, user)
 
 
 @router.get(
