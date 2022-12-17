@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from lib.auth.user import get_current_active_user
-from lib.db import chores, user as userDB, types
+from lib.db import chores, user as userDB, types, timetable
 from lib import err, io
 from typing import List
 from routes.username import house
@@ -71,12 +71,20 @@ async def get_user_chores(
 
 @router.get(
     "/timetable",
+    tags=["timetable"],
     description="Returns the user's timetable that includes every household.",
+    status_code=200,
+    responses={
+      403: {"message": "A user tries to access someone else's timetable", "model": err.HTTPError}
+    }
 )
 async def get_user_timetable(
     username, user: types.User = Depends(get_current_active_user)
 ):
-    return "timetable"
+    if username != user.username:
+      raise HTTPException(403)
+      
+    return await timetable.get_users_timetable(user)
 
 
 @router.post("/timetable/upload", description="Upload your university timetable")

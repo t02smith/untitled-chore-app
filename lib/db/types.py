@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict
 from datetime import datetime
 import re
 from dataclasses import dataclass
@@ -80,17 +80,15 @@ class TimetabledChore(BaseModel):
 # a timetable for a house for a given week
 class Timetable(BaseModel):
     id: str
-    house_id: str
-    start: datetime
-    end: datetime
+    home_id: str
+    start: str
+    end: str
     tasks: List[TimetabledChore]
-
-
-class TimetableOut(BaseModel):
-    house_name: str
-    start: datetime
-    end: datetime
-    tasks: List[TimetabledChore]
+    
+    
+class UserTimetable(BaseModel):
+  username: str
+  tasks: Dict[str, List[TimetabledChore]]
 
 
 # ! HOME
@@ -108,7 +106,6 @@ class Home(BaseModel):
     chores: List[str]
     creator: str
     invite_link: HomeInvite | None = None
-    timetable: Timetable | None = None
 
     def to_json(self):
         dic = self.__dict__

@@ -40,41 +40,8 @@ async def get_home_by_creator_and_name(
       creator=home.creator,
       residents=await user.get_users_by_username_from_list(home.residents),
       chores=await chores.get_chores_by_id_from_list(home.chores),
-      timetable=home.timetable,
       invite_link=home.invite_link
     )
-
-
-
-# async def get_home_by_creator_and_name(
-#     creator: str, name: str, container=None
-# ) -> types.Home | None:
-#     async def func():
-
-#         res = [
-#             Home(**h)
-#             async for h in container.query_items(
-#                 """
-#       SELECT TOP 1 *
-#       FROM homes h
-#       WHERE h.name=@name AND h.creator=@creator
-#       """,
-#                 parameters=[
-#                     {"name": "@name", "value": name},
-#                     {"name": "@creator", "value": creator},
-#                 ],
-#             )
-#         ]
-
-#         return None if len(res) == 0 else res[0]
-
-#     if container is not None:
-#         return await func()
-#     else:
-#         async with db.get_client() as client:
-#             container = await db.get_or_create_container(client, "homes")
-#             return await func()
-
 
 async def create_home(home: types.HomeIn, user: types.User):
     async with db.get_client() as client:
@@ -134,21 +101,19 @@ async def update_home(
         return types.Home(**await container_homes.upsert_item(home.__dict__))
 
 
-async def get_homes(user: types.User):
+async def get_users_homes(user: types.User):
     async with db.get_client() as client:
         container = await db.get_or_create_container(client, "homes")
 
         res = container.query_items(
-            """
-      SELECT h.name
-      from homes h
-      WHERE ARRAY_CONTAINS (h['residents'], @username)
-      """,
-            parameters=[{"name": "@username", "value": user.username}],
+          """
+            SELECT *
+            from homes h
+            WHERE ARRAY_CONTAINS (h['residents'], @username)
+          """, parameters=[{"name": "@username", "value": user.username}],
         )
 
-        res2 = [r["name"] async for r in res]
-        return res2
+        return [types.Home(**h) async for h in res]
 
 
 async def delete_home(id: str, user: types.User):

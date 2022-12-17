@@ -37,7 +37,11 @@ async def get_home(username: str, house_name: str, user: types.User = Depends(us
   }  
 )
 async def get_home_timetable(username: str, house_name: str, user: types.User = Depends(userAuth.get_current_active_user) ):
-    return await timetable.get_or_generate_timetable(username, house_name, user)
+    res = await timetable.get_or_generate_timetable(username, house_name, user)
+    if res is None:
+      raise HTTPException(500)
+    
+    return res
 
 
 @router.put("/", description="Update an existing house", tags=["home"])
