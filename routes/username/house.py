@@ -7,14 +7,37 @@ from typing import List
 router = APIRouter(prefix="/{house_name}")
 
 
-@router.get("/", tags=["house"])
+@router.get(
+  "/", 
+  tags=["home"], 
+  status_code=200, 
+  response_model=types.Home, 
+  description="Returns a JSON object of a home if the user has sufficient permissions to view it.",
+  responses={
+    403: {"message": "User doesn't have permission to view this house", "model": err.HTTPError},
+    404: {"message": "House not found", "model": err.HTTPError}
+  }
+)
 async def get_home(username: str, house_name: str, user: types.User = Depends(userAuth.get_current_active_user)):
-    return await home.get_home_by_creator_and_name(username, house_name, user)
+    res = await home.get_home_by_creator_and_name(username, house_name, user)
+    if res is None:
+      raise HTTPException(404)
+    
+    return res
 
-
-@router.get("/timetable")
-async def get_home_timetable():
-    pass
+@router.put(
+  "/timetable", 
+  tags=["home"],
+  description="Get this week's chore timetable or generate one if it doesn't exist or is expired",
+  status_code=200,
+  response_model=types.Timetable,
+  responses={
+    403: {"message": "You do not have permission to view this timetable", "model": err.HTTPError},
+    404: {"message": "House not found", "model": err.HTTPError}
+  }  
+)
+async def get_home_timetable(username: str, house_name: str, user: types.User = Depends(userAuth.get_current_active_user) ):
+    return await timetable.get_or_generate_timetable(username, house_name, user)
 
 
 @router.put("/", description="Update an existing house", tags=["home"])
@@ -106,23 +129,3 @@ async def join_home_via_invite_link(
 ):
     await home.join_home_via_invite_link(username, house_name, invite_id, user)
     return "Joined home successfully"
-
-
-# ! TIMETABLE
-
-
-@router.get(
-    "/timetable",
-    summary="Get this week's timetable for a given house",
-    status_code=200,
-    tags=["home"],
-)
-async def get_or_generate_timetable(
-    username: str,
-    house_name: str,
-    user: types.User = Depends(userAuth.get_current_active_user),
-):
-    # return await timetable.get_or_generate_timetable(
-    #     username, house_name, user.username
-    # )
-    pass

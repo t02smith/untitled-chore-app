@@ -6,9 +6,7 @@ from typing import List
 from routes.username import house
 
 router = APIRouter(prefix="/{username}")
-
 router.include_router(house.router)
-
 
 @router.get(
     "/",
@@ -40,10 +38,7 @@ async def get_user_info(
     response_model=types.UserOut,
     status_code=200,
     responses={
-        403: {
-            "message": "User not authorized to change this user's details",
-            "model": err.HTTPError,
-        }
+        403: {"message": "User not authorized to change this user's details","model": err.HTTPError,}
     },
 )
 async def update_user_info(

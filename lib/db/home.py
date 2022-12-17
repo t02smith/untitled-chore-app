@@ -13,7 +13,7 @@ async def get_home_by_creator_and_name(
     house_name: str,
     caller: types.User,
     fetch_chores_and_residents: bool = False,
-) -> types.Home | types.HomeFull:
+) -> types.Home | types.HomeFull | None:
   async with db.get_client() as client:
     home_container = await db.get_or_create_container(client, "homes")
     home_query_res = [h async for h in home_container.query_items("""
@@ -25,7 +25,7 @@ async def get_home_by_creator_and_name(
                   {"name": "@creator", "value": creator}])]
     
     if len(home_query_res) == 0:
-      raise HTTPException(404)
+      return None
     
     home = types.Home(**home_query_res[0])
     if caller.username != home.creator or caller.username not in home.residents:
