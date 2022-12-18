@@ -1,12 +1,10 @@
 from lib.db import user, home as homeDB, db, chores, types
 from fastapi import HTTPException
 from datetime import datetime, timedelta
+from starlette.responses import RedirectResponse
 
 async def get_or_generate_timetable(home_creator: str, home_name: str, caller: types.User) -> types.Timetable:
     home = await homeDB.get_home_by_creator_and_name(home_creator, home_name, caller)
-    if home is None:
-        raise HTTPException(404) 
-
     existing_timetable = await get_homes_timetable(home.id)
     if existing_timetable is not None and existing_timetable.end > datetime.now().isoformat():
       return existing_timetable
@@ -84,3 +82,35 @@ async def get_users_timetable(user: types.User) -> types.UserTimetable:
       ))
       
     return userTimetables
+  
+  
+async def complete_task(username: str, house_name: str, chore_id: str, user: types.User):
+  home = await homeDB.get_home_by_creator_and_name(username, house_name, user)
+  async with db.get_client() as client:
+    container = await db.get_or_create_container(client, "timetables")
+    timetable = await get_homes_timetable(home.id)
+    if timetable.end < datetime.now().isoformat():
+      return RedirectResponse(url=f"/api/v1/{username}/{house_name}/timetable", status_code=302)
+    
+    chore = list(filter(lambda t: t.chore_id == chore_id, timetable.tasks))
+    if len(chore) == 0:
+      raise HTTPException(404, detail=f"Chore with id {chore_id} not found in this timetable")
+    
+    chore = chore[0]
+    if chore.user_id != user.username:
+      raise HTTPException(403, detail=f"Chore with id {chore_id} is not assigned to user {user.username}")
+    
+    if chore.complete:
+      raise HTTPException(400, detail="This chore is already complete")
+    
+    chore.complete = True
+    await container.upsert_item({
+      "id": timetable.id,
+      "home_id": timetable.home_id,
+      "start": timetable.start,
+      "end": timetable.end,
+      "tasks": list(map(lambda t: t.__dict__, timetable.tasks)) 
+    })
+    
+    return chore
+    

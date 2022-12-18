@@ -25,11 +25,11 @@ async def get_home_by_creator_and_name(
                   {"name": "@creator", "value": creator}])]
     
     if len(home_query_res) == 0:
-      return None
+      raise HTTPException(404, detail=f"Home {creator}/{house_name} not found")
     
     home = types.Home(**home_query_res[0])
     if caller.username != home.creator or caller.username not in home.residents:
-      raise HTTPException(403)
+      raise HTTPException(403, detail="You do not have permission to view this home")
     
     if not fetch_chores_and_residents:
       return home
@@ -62,13 +62,12 @@ async def create_home(home: types.HomeIn, user: types.User):
         res.append(user.username)
         res = await container_homes.create_item(
             {
-                "name": home.name,
-                "residents": res,
-                "chores": [] if home.chores is None else home.chores,
-                "creator": user.username,
-                "invite_link": None,
-            },
-            enable_automatic_id_generation=True,
+              "name": home.name,
+              "residents": res,
+              "chores": [] if home.chores is None else home.chores,
+              "creator": user.username,
+              "invite_link": None,
+            }, enable_automatic_id_generation=True
         )
 
         return types.Home(**res)
@@ -79,24 +78,7 @@ async def update_home(
 ):
     async with db.get_client() as client:
         container_homes = await db.get_or_create_container(client, "homes")
-
-        home_res = container_homes.query_items(
-            """
-      SELECT * 
-      FROM homes h
-      WHERE h.creator=@creator AND h.name=@name
-      """,
-            parameters=[
-                {"name": "@creator", "value": creator},
-                {"name": "@name", "value": house_name},
-            ],
-        )
-
-        homes = [types.Home(**h) async for h in home_res]
-        if len(homes) == 0:
-            raise HTTPException(404)
-
-        home = homes[0]
+        home = await get_home_by_creator_and_name(creator, house_name, user)
         home.name = home.name if homeUpdate.name == None else homeUpdate.name
         return types.Home(**await container_homes.upsert_item(home.__dict__))
 
@@ -136,13 +118,9 @@ async def create_invite_link(
 
         # Check home exists
         home = await get_home_by_creator_and_name(container, creator, house_name)
-        if home is None:
-            raise HTTPException(404)
 
-        if (
-            home.invite_link is not None
-            and datetime.now().isoformat() < home.invite_link.expiry
-        ):
+        if (home.invite_link is not None
+            and datetime.now().isoformat() < home.invite_link.expiry):
             return home.invite_link
 
         # generate required link values

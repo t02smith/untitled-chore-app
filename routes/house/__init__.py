@@ -7,6 +7,7 @@ router = APIRouter(prefix="/house")
 
 @router.post(
     "/",
+    status_code=201,
     description="Create a new house where the creator is a resident.",
     tags=["house"],
 )

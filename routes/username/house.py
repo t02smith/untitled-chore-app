@@ -19,11 +19,21 @@ router = APIRouter(prefix="/{house_name}")
   }
 )
 async def get_home(username: str, house_name: str, user: types.User = Depends(userAuth.get_current_active_user)):
-    res = await home.get_home_by_creator_and_name(username, house_name, user)
-    if res is None:
-      raise HTTPException(404)
-    
-    return res
+    return await home.get_home_by_creator_and_name(username, house_name, user)
+
+
+@router.put("/", description="Update an existing house", tags=["home"])
+async def update_home(
+    username: str,
+    house_name: str,
+    newHome: types.HomeIn,
+    user: types.User = Depends(userAuth.get_current_active_user),
+):
+    if username != user.username:
+        raise HTTPException(403, detail="You do not have permission to update this home")
+
+    return await home.update_home(newHome, username, house_name, user)
+
 
 @router.put(
   "/timetable", 
@@ -44,17 +54,21 @@ async def get_home_timetable(username: str, house_name: str, user: types.User = 
     return res
 
 
-@router.put("/", description="Update an existing house", tags=["home"])
-async def update_home(
-    username: str,
-    house_name: str,
-    newHome: types.HomeIn,
-    user: types.User = Depends(userAuth.get_current_active_user),
-):
-    if username != user.username:
-        raise HTTPException(403)
-
-    return await home.update_home(newHome, username, house_name, user)
+@router.put(
+  "/complete", 
+  description="Set a user's task to complete",
+  tags=["home", "timetable"],
+  status_code=200,
+  response_model=types.TimetabledChore,
+  responses={
+    302: {"message": "The timetable needs to be regenerated before this can be called"},
+    400: {"message": "The chore is already complete or the timetable is expired", "model": err.HTTPError},
+    403: {"message": "The chore isn't assigned to the user trying to complete or the user is not in the house", "model": err.HTTPError},
+    404: {"message": "The house doesn't exist or the chore isn't part of the timetable", "model": err.HTTPError}
+  }
+)
+async def complete_task(username: str, house_name: str, chore_id: str, user: types.User = Depends(userAuth.get_current_active_user)):
+  return await timetable.complete_task(username, house_name, chore_id, user)
 
 
 # ! CHORES
@@ -77,14 +91,7 @@ async def get_house_chores(
     house_name: str,
     user: types.User = Depends(userAuth.get_current_active_user),
 ):
-    house = await home.get_home_by_creator_and_name(username, house_name)
-    if house is None:
-        raise HTTPException(404)
-
-    if user.username not in house.residents:
-        raise HTTPException(403)
-
-    return house.chores
+    return (await home.get_home_by_creator_and_name(username, house_name)).chores
 
 
 # ! INVITES
