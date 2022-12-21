@@ -1,0 +1,80 @@
+from fastapi import APIRouter, Depends, HTTPException
+from routes import chores
+from routes.username import root as username
+from lib.db import types, db, user
+from lib.auth.user import get_current_active_user
+from lib.auth import tokens, user as userAuth, auth
+from fastapi.security import OAuth2PasswordRequestForm
+from datetime import timedelta
+from lib import err
+
+
+router = APIRouter(prefix="/api/v1")
+router.include_router(chores.router)
+router.include_router(username.router)
+
+
+@router.post(
+    "/login",
+    response_model=tokens.Token,
+    description="Login using an existing account to untitled-chore-api",
+    tags=["user", "auth"],
+    status_code=201,
+    responses={
+        400: {"description": "Invalid username or password", "model": err.HTTPError},
+        401: {"description": "Incorrect username or password", "model": err.HTTPError},
+    },
+)
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    if not types.User.username_valid(form_data.username):
+        raise HTTPException(
+            400,
+            detail="Invalid username or password",
+        )
+
+    user = await userAuth.authenticate_user(form_data.username, form_data.password)
+    if user is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    access_token_Expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = tokens.create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_Expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post(
+    "/register",
+    response_model=tokens.Token,
+    description="Register a new user to untitled-chore-api",
+    tags=["user", "auth"],
+    status_code=201,
+    responses={
+        400: {
+            "description": "Invalid user details or user already exists",
+            "model": err.HTTPError,
+        }
+    },
+)
+async def register(userInfo: types.UserIn):
+    # ? check format for username, password, email
+    if not all(
+        [User.username_valid(userInfo.username), User.email_valid(userInfo.email)]
+    ):
+        raise HTTPException(
+            400, detail="Invalid format for username, email or password"
+        )
+
+    # ? create new user
+    await user.register_user(userInfo)
+
+    # * check access token
+    access_token_Expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = tokens.create_access_token(
+        data={"sub": userInfo.username}, expires_delta=access_token_Expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}

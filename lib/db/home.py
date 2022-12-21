@@ -13,7 +13,7 @@ async def get_home_by_creator_and_name(
     house_name: str,
     caller: types.User,
     fetch_chores_and_residents: bool = False,
-) -> types.Home | types.HomeFull | None:
+) -> types.Home | types.HomeFull:
   async with db.get_client() as client:
     home_container = await db.get_or_create_container(client, "homes")
     home_query_res = [h async for h in home_container.query_items("""
@@ -43,6 +43,8 @@ async def get_home_by_creator_and_name(
       invite_link=home.invite_link
     )
 
+
+# TODO Check home doesnt exist
 async def create_home(home: types.HomeIn, user: types.User):
     async with db.get_client() as client:
         container_homes = await db.get_or_create_container(client, "homes")
@@ -98,51 +100,45 @@ async def get_users_homes(user: types.User):
         return [types.Home(**h) async for h in res]
 
 
-async def delete_home(id: str, user: types.User):
-    async with db.get_client() as client:
-        container = await db.get_or_create_container(client, "homes")
-
-        res = await container.read_item(id, partition_key=id)
-
-        if res["creator"] == user.username:
-            await container.delete_item(id, partition_key=id)
-        else:
-            raise HTTPException(401, "Not the creator")
-
+async def delete_home(creator: str, home_name: str, caller: types.User):
+  if caller != creator:
+    raise HTTPException(403, detail="You do not have permission to delete this home")
+  
+  home = await get_home_by_creator_and_name(creator, home_name, caller) 
+  async with db.get_client() as client:
+    container = await db.get_or_create_container(client, "homes")
+    await container.delete_item(home.id, partition_key=home.id)
+    
 
 async def create_invite_link(
     creator: str, house_name: str, user: types.User, link_alive_time_hours: int = 24
 ) -> types.HomeInvite:
+    if caller != creator:
+      raise HTTPException(403, detail="You do not have permission to create an invite link for this home")
+    
+    home = await get_home_by_creator_and_name(creator, house_name, caller)
+    if home.invite_link is not None and datetime.now().isoformat() < home.invite_link.expiry:
+      return home.invite_link
+    
+    # Create new invite link
+    created_at = datetime.now()
+    expiry = (created_at + timedelta(hours=link_alive_time_hours)).isoformat()
+    
+    hasher = sha1()
+    hasher.update(str(nonce).encode())
+    hasher.update(expiry.encode())
+    hasher.update(created_at.isoformat().encode())
+    hasher.update(home.id.encode())
+    
+    home.invite_link = types.HomeInvite(id=hasher.hexdigest(), expiry=expiry)
+    dic = home.__dict__
+    dic["invite_link"] = home.invite_link.__dict__
+    
     async with db.get_client() as client:
-        container = await db.get_or_create_container(client, "homes")
-
-        # Check home exists
-        home = await get_home_by_creator_and_name(container, creator, house_name)
-
-        if (home.invite_link is not None
-            and datetime.now().isoformat() < home.invite_link.expiry):
-            return home.invite_link
-
-        # generate required link values
-        nonce = randint(0, 100000000000000000000)
-        created_at = datetime.now()
-        expiry = (created_at + timedelta(hours=link_alive_time_hours)).isoformat()
-
-        # hash values
-        hasher = sha1()
-        hasher.update(str(nonce).encode())
-        hasher.update(expiry.encode())
-        hasher.update(created_at.isoformat().encode())
-        hasher.update(home.id.encode())
-
-        home.invite_link = types.HomeInvite(id=hasher.hexdigest(), expiry=expiry)
-        dic = home.__dict__
-        dic["invite_link"] = home.invite_link.__dict__
-
-        await container.upsert_item(dic)
-        print(home.invite_link)
-        return home.invite_link
-
+      container = await db.get_or_create_container(client, "homes")
+      await container.upsert_item(dic)
+      
+    return home.invite_link
 
 async def join_home_via_invite_link(
     home_creator: str, home_name: str, invite_id: str, user: types.User

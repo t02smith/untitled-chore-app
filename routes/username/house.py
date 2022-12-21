@@ -14,8 +14,8 @@ router = APIRouter(prefix="/{house_name}")
   response_model=types.Home, 
   description="Returns a JSON object of a home if the user has sufficient permissions to view it.",
   responses={
-    403: {"message": "User doesn't have permission to view this house", "model": err.HTTPError},
-    404: {"message": "House not found", "model": err.HTTPError}
+    403: {"description": "User doesn't have permission to view this house", "model": err.HTTPError},
+    404: {"description": "House not found", "model": err.HTTPError}
   }
 )
 async def get_home(username: str, house_name: str, user: types.User = Depends(userAuth.get_current_active_user)):
@@ -42,8 +42,8 @@ async def update_home(
   status_code=200,
   response_model=types.Timetable,
   responses={
-    403: {"message": "You do not have permission to view this timetable", "model": err.HTTPError},
-    404: {"message": "House not found", "model": err.HTTPError}
+    403: {"description": "You do not have permission to view this timetable", "model": err.HTTPError},
+    404: {"description": "House not found", "model": err.HTTPError}
   }  
 )
 async def get_home_timetable(username: str, house_name: str, user: types.User = Depends(userAuth.get_current_active_user) ):
@@ -61,10 +61,10 @@ async def get_home_timetable(username: str, house_name: str, user: types.User = 
   status_code=200,
   response_model=types.TimetabledChore,
   responses={
-    302: {"message": "The timetable needs to be regenerated before this can be called"},
-    400: {"message": "The chore is already complete or the timetable is expired", "model": err.HTTPError},
-    403: {"message": "The chore isn't assigned to the user trying to complete or the user is not in the house", "model": err.HTTPError},
-    404: {"message": "The house doesn't exist or the chore isn't part of the timetable", "model": err.HTTPError}
+    302: {"description": "The timetable needs to be regenerated before this can be called"},
+    400: {"description": "The chore is already complete or the timetable is expired", "model": err.HTTPError},
+    403: {"description": "The chore isn't assigned to the user trying to complete or the user is not in the house", "model": err.HTTPError},
+    404: {"description": "The house doesn't exist or the chore isn't part of the timetable", "model": err.HTTPError}
   }
 )
 async def complete_task(username: str, house_name: str, chore_id: str, user: types.User = Depends(userAuth.get_current_active_user)):
@@ -82,8 +82,8 @@ async def complete_task(username: str, house_name: str, chore_id: str, user: typ
     response_model=List[types.Chore],
     status_code=200,
     responses={
-        404: {"message": "house not found", "model": err.HTTPError},
-        403: {"message": "user not in house", "model": err.HTTPError},
+        404: {"description": "house not found", "model": err.HTTPError},
+        403: {"description": "user not in house", "model": err.HTTPError},
     },
 )
 async def get_house_chores(
@@ -104,8 +104,8 @@ async def get_house_chores(
     tags=["user", "home"],
     response_model=types.HomeInvite,
     responses={
-        403: {"message": "Not authorized to make a link", "model": err.HTTPError},
-        404: {"message": "Home not found", "model": err.HTTPError},
+        403: {"description": "Not authorized to make a link", "model": err.HTTPError},
+        404: {"description": "Home not found", "model": err.HTTPError},
     },
 )
 async def create_invite_link(
@@ -126,10 +126,10 @@ async def create_invite_link(
     tags=["user", "home"],
     responses={
         400: {
-            "message": "Invalid invite link or user already in home",
+            "description": "Invalid invite link or user already in home",
             "model": err.HTTPError,
         },
-        404: {"message": "Home not found", "model": err.HTTPError},
+        404: {"description": "Home not found", "model": err.HTTPError},
     },
 )
 async def join_home_via_invite_link(
