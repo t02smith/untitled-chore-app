@@ -1,10 +1,11 @@
 <script setup>
-import { RouterLink, RouterView } from "vue-router";
-import Login from "./views/Login.vue"
 </script>
 
 <template>
-    <Login />
+    <div class="container">
+        <!-- Displays current route -->
+        <router-view></router-view>
+    </div>
 </template>
 
 <style scoped>
