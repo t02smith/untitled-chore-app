@@ -5,8 +5,8 @@
         Create a new home!
       </h1>
       <p class="lead">
-        Fill in the fields below to create a new home, add some chores, invite
-        your housemates and jumpstart your productivity!
+        Choose a house name, your choice of chores made by us, which friends you
+        want to invite and create your house now to jumpstart your productivity!
       </p>
     </div>
 
@@ -20,6 +20,7 @@
         <p id="helpId" class="text-muted" style="margin-top: -0.5rem">
           This has to be different from all your other houses
         </p>
+        <div class="d-flex gap-2"></div>
         <input
           type="text"
           name=""
@@ -53,7 +54,7 @@
         <p class="text-muted" style="margin-top: -0.5rem">
           Sent your housemates an invite to join once your house is created
         </p>
-        <div class="input-group mb-3">
+        <form class="input-group mb-3" @submit.prevent="newUser">
           <span class="input-group-text" id="basic-addon1">@</span>
           <input
             type="text"
@@ -62,11 +63,14 @@
             v-model="userToInvite"
             @submit="console.log('hello')"
           />
-        </div>
+
+          <button type="submit" class="btn btn-primary">Invite</button>
+        </form>
 
         <div class="d-flex gap-2">
           <button
             class="btn btn-primary font-weight-bold px-2 py-1"
+            @click="() => removeUser(user)"
             v-for="user in invitedUsers"
           >
             <small>{{ user }}</small>
@@ -92,7 +96,14 @@ const houseName = ref("");
 const chosenChores = ref([]);
 
 const userToInvite = ref("");
-const invitedUsers = ref(["t02smith", "tcs1g20"]);
+const invitedUsers = ref([]);
+
+const newUser = () => {
+  invitedUsers.value.push(userToInvite.value);
+  userToInvite.value = "";
+};
+const removeUser = (rm) =>
+  (invitedUsers.value = invitedUsers.value.filter((u) => u !== rm));
 
 const toggleChore = (id) =>
   chosenChores.value.includes(id)
@@ -105,42 +116,42 @@ const chores = [
     name: "Clean the Shower",
     room: "Bathroom",
     color: "#0ac",
-    icon: "/src/assets/svg/bath.svg",
+    icon: "fa fa-shower",
   },
   {
     id: 1,
     name: "Do the Dishes",
     room: "Kitchen",
     color: "#F24E1E",
-    icon: "/src/assets/svg/kitchen.svg",
+    icon: "fa-solid fa-kitchen-set",
   },
   {
     id: 2,
     name: "Hoover",
     room: "Living Room",
     color: "#0FA958",
-    icon: "/src/assets/svg/lounge.svg",
+    icon: "fa-solid fa-couch",
   },
   {
     id: 3,
     name: "Take the Bins Out",
     room: "Kitchen",
     color: "#F24E1E",
-    icon: "/src/assets/svg/kitchen.svg",
+    icon: "fa-solid fa-kitchen-set",
   },
   {
     id: 4,
     name: "Tidy Up",
     room: "Living Room",
     color: "#0FA958",
-    icon: "/src/assets/svg/lounge.svg",
+    icon: "fa-solid fa-couch",
   },
   {
     id: 5,
     name: "Clean the Toilet",
     room: "Bathroom",
     color: "#0ac",
-    icon: "/src/assets/svg/bath.svg",
+    icon: "fa fa-shower",
   },
 ];
 

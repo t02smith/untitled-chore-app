@@ -2,7 +2,11 @@
   <div class="card text-white bg-dark shadow" style="width: 20rem">
     <div class="card-body">
       <div class="d-flex gap-3 align-items-center">
-        <img :src="props.icon" alt="" class="rounded-full" />
+        <font-awesome-icon
+          :icon="props.icon"
+          :style="`color: ${props.color}`"
+          style="font-size: 2rem"
+        />
         <div class="flex-grow-1">
           <h5 class="card-title">{{ props.name }}</h5>
           <h6
