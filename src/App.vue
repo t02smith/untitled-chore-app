@@ -1,12 +1,13 @@
 <script setup>
+import NavBar from "./components/NavBar.vue";
 </script>
 
 <template>
-    <div class="container">
-        <!-- Displays current route -->
-        <router-view></router-view>
-    </div>
+  <div>
+    <NavBar />
+    <!-- Displays current route -->
+    <router-view></router-view>
+  </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
