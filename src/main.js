@@ -6,13 +6,15 @@ import {
   faShower,
   faCouch,
   faKitchenSet,
+  faHouse,
+  faGear,
 } from "@fortawesome/free-solid-svg-icons";
 
 import App from "./App.vue";
 import router from "./router";
 
 import "./assets/main.css";
-library.add(faShower, faCouch, faKitchenSet);
+library.add(faShower, faCouch, faKitchenSet, faHouse, faGear);
 
 const app = createApp(App);
 app.component("font-awesome-icon", FontAwesomeIcon);
