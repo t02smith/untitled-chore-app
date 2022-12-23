@@ -4,7 +4,7 @@
 
 <template>
     <form>
-        <img src="@/assets/logo.png" alt="Image can't be displayed" width="100" height="auto">
+        <img src="@/assets/logo.png" alt="Image can't be displayed" width="85" height="85">
 
         <h1 class="display-6">Register</h1>
 
