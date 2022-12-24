@@ -1,9 +1,10 @@
-from fastapi import HTTPException
-from lib.db import user, db, types, chores
-from pydantic import BaseModel
 from datetime import datetime, timedelta
-from random import randint
 from hashlib import sha1
+from random import randint
+from lib.db import user, db, types
+from typing import List
+from pydantic import BaseModel
+from fastapi import HTTPException
 
 # * GETTERS
 
