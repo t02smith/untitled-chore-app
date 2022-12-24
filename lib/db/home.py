@@ -1,6 +1,10 @@
+from datetime import datetime, timedelta
+from hashlib import sha1
+from random import randint
 from lib.db import user, db
 from typing import List
 from pydantic import BaseModel
+from fastapi import HTTPException
 
 # ! CLASSES
 
@@ -79,6 +83,7 @@ async def create_home(home: HomeIn, user: user.User):
                 "residents": res,
                 "chores": [] if home.chores is None else home.chores,
                 "creator": user.username,
+                "invite_link": None
             },
             enable_automatic_id_generation=True,
         )
@@ -150,26 +155,7 @@ async def delete_home(id: str, user: user.User):
             await container.delete_item(id, partition_key=id)
         else:
             raise HTTPException(401, "Not the creator")
-
-
-async def register_home(home: HomeIn, creator: str):
-    async with db.get_client() as client:
-        container = await db.get_or_create_container(client, "homes")
-
-        if home.residents is None:
-            home.residents = []
-
-        home.residents.append(creator)
-        await container.create_item(
-            {
-                "name": home.name,
-                "residents": home.residents,
-                "chores": [] if home.chores is None else home.chores,
-                "creator": creator,
-            },
-            enable_automatic_id_generation=True,
-        )
-
+          
 
 async def create_invite_link(
     creator: str, house_name: str, user: user.User, link_alive_time_hours: int = 24
