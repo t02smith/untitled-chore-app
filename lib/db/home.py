@@ -13,6 +13,7 @@ async def get_home_by_creator_and_name(
     house_name: str,
     caller: types.User,
     fetch_chores_and_residents: bool = False,
+    allow_all_users: bool = False
 ) -> types.Home | types.HomeFull:
   async with db.get_client() as client:
     home_container = await db.get_or_create_container(client, "homes")
@@ -28,7 +29,7 @@ async def get_home_by_creator_and_name(
       raise HTTPException(404, detail=f"Home {creator}/{house_name} not found")
     
     home = types.Home(**home_query_res[0])
-    if caller.username != home.creator or caller.username not in home.residents:
+    if (caller.username != home.creator or caller.username not in home.residents) and not allow_all_users:
       raise HTTPException(403, detail="You do not have permission to view this home")
     
     if not fetch_chores_and_residents:
@@ -111,9 +112,9 @@ async def delete_home(creator: str, home_name: str, caller: types.User):
     
 
 async def create_invite_link(
-    creator: str, house_name: str, user: types.User, link_alive_time_hours: int = 24
+    creator: str, house_name: str, caller: types.User, link_alive_time_hours: int = 24
 ) -> types.HomeInvite:
-    if caller != creator:
+    if caller.username != creator:
       raise HTTPException(403, detail="You do not have permission to create an invite link for this home")
     
     home = await get_home_by_creator_and_name(creator, house_name, caller)
@@ -125,12 +126,13 @@ async def create_invite_link(
     expiry = (created_at + timedelta(hours=link_alive_time_hours)).isoformat()
     
     hasher = sha1()
-    hasher.update(str(nonce).encode())
+    hasher.update(str(randint(0,999999)).encode())
     hasher.update(expiry.encode())
     hasher.update(created_at.isoformat().encode())
     hasher.update(home.id.encode())
+    id = hasher.hexdigest()
     
-    home.invite_link = types.HomeInvite(id=hasher.hexdigest(), expiry=expiry)
+    home.invite_link = types.HomeInvite(id=id, expiry=expiry, link=f"/api/v1/{creator}/{house_name}/join?invite_id={id}")
     dic = home.__dict__
     dic["invite_link"] = home.invite_link.__dict__
     
@@ -141,34 +143,20 @@ async def create_invite_link(
     return home.invite_link
 
 async def join_home_via_invite_link(
-    home_creator: str, home_name: str, invite_id: str, user: types.User
+    home_creator: str, home_name: str, invite_id: str, caller: types.User
 ):
+    home: types.Home = await get_home_by_creator_and_name(home_creator, home_name, caller, allow_all_users=True)
+    if home.invite_link.id != invite_id:
+      raise HTTPException(404, detail="Invite link not found")
+    
+    if home.invite_link.expiry < datetime.now().isoformat():
+      raise HTTPException(400, detail="Invite link has expired")
+    
+    if caller.username in home.residents:
+      raise HTTPException(400, detail="You are already a resident in this home")
+    
+    home.residents.append(caller.username)
     async with db.get_client() as client:
-        container = await db.get_or_create_container(client, "homes")
+      container = await db.get_or_create_container(client, "homes")
+      return types.Home(**await container.upsert_item(home.to_json()))
 
-        homes = container.query_items(
-            """
-      SELECT TOP 1 *
-      FROM homes h
-      WHERE h.invite_link.id=@id AND h.name=@name AND h.creator=@creator
-      """,
-            parameters=[
-                {"name": "@id", "value": invite_id},
-                {"name": "@name", "value": home_name},
-                {"name": "@creator", "value": home_creator},
-            ],
-        )
-
-        awaited_homes = [types.Home(**h) async for h in homes]
-        if len(awaited_homes) == 0:
-            raise HTTPException(404, detail="Invite link not found")
-
-        home: Home = awaited_homes[0]
-        if home.invite_link.expiry < datetime.now().isoformat():
-            raise HTTPException(400, detail="Expired invite link")
-
-        if user.username in home.residents:
-            raise HTTPException(400, detail="You are already in this home")
-
-        home.residents.append(user.username)
-        await container.upsert_item(home.to_json())

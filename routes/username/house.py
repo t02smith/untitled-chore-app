@@ -119,17 +119,15 @@ async def create_invite_link(
     return await home.create_invite_link(username, house_name, user)
 
 
-@router.get(
+@router.put(
     "/join",
     description="Join a home via an invite link",
     status_code=200,
     tags=["user", "home"],
+    response_model=types.Home,
     responses={
-        400: {
-            "description": "Invalid invite link or user already in home",
-            "model": err.HTTPError,
-        },
-        404: {"description": "Home not found", "model": err.HTTPError},
+        400: {"description": "Invalid invite link or user already in home","model": err.HTTPError},
+        404: {"description": "Home or invite link not found", "model": err.HTTPError},
     },
 )
 async def join_home_via_invite_link(
@@ -138,5 +136,4 @@ async def join_home_via_invite_link(
     invite_id: str,
     user: types.User = Depends(userAuth.get_current_active_user),
 ):
-    await home.join_home_via_invite_link(username, house_name, invite_id, user)
-    return "Joined home successfully"
+    return await home.join_home_via_invite_link(username, house_name, invite_id, user)       

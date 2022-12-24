@@ -102,6 +102,7 @@ class UserTimetable(BaseModel):
 
 class HomeInvite(BaseModel):
     id: str
+    link: str
     expiry: str
 
 

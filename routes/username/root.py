@@ -28,7 +28,7 @@ async def get_user_info(
             username=userLookup.username, first_name=userLookup.first_name
         )
 
-    return userDB.UserOut(**user.__dict__)
+    return types.UserOut(**user.__dict__)
 
 
 @router.put(
