@@ -45,6 +45,7 @@
             :color="c.color"
             :icon="c.icon"
             :onToggle="() => toggleChore(c.id)"
+            style="width: 20rem"
           />
         </div>
       </div>

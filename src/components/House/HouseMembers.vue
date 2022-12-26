@@ -7,15 +7,15 @@
         class="list-group-item bg-dark text-light row d-flex"
       >
         <p
-          class="col text-primary"
+          class="col-3 text-primary"
           style="font-size: 1.5rem; font-weight: bold"
         >
-          {{ user.choresLeft }}
+          {{ user.choresLeft }} to go
         </p>
-        <div class="fw-bold col-4" style="font-size: 1.6rem">
+        <div class="fw-bold col-3" style="font-size: 1.6rem">
           {{ user.username }}
         </div>
-        <p class="col-7" style="font-size: 1.1rem">
+        <p class="col-6" style="font-size: 1.1rem">
           {{ "⭐".repeat(user.score) }}
         </p>
       </li>

@@ -47,7 +47,7 @@
       <div class="row">
         <HouseMembers class="col" />
 
-        <div class="col-6"></div>
+        <HouseChoreList class="col-6" />
 
         <div class="col"></div>
       </div>
@@ -56,7 +56,8 @@
 </template>
 <script setup>
 import { ref } from "vue";
-import HouseMembers from "../../components/HouseMembers.vue";
+import HouseMembers from "../../components/House/HouseMembers.vue";
+import HouseChoreList from "../../components/House/HouseChoreList.vue";
 
 const homes = ref(["Home", "Parent's", "The Boys"]);
 
