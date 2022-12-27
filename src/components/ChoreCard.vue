@@ -44,6 +44,7 @@ const props = defineProps({
   },
   username: {
     type: String,
+    default: "",
   },
   color: {
     type: String,

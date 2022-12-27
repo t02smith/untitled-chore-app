@@ -11,7 +11,7 @@
     </div>
 
     <form
-      @submit.prevent=""
+      @submit.prevent="createHome"
       class="d-flex flex-column gap-5"
       style="max-width: 992px"
     >
@@ -45,6 +45,7 @@
             :color="c.color"
             :icon="c.icon"
             :onToggle="() => toggleChore(c.id)"
+            :noToggle="false"
             style="width: 20rem"
           />
         </div>
@@ -92,6 +93,9 @@
 <script setup>
 import { ref } from "vue";
 import ChoreCard from "../../components/ChoreCard.vue";
+import { useHomeStore } from "../../stores/home";
+
+const home = useHomeStore();
 
 const houseName = ref("");
 const chosenChores = ref([]);
@@ -110,6 +114,11 @@ const toggleChore = (id) =>
   chosenChores.value.includes(id)
     ? (chosenChores.value = chosenChores.value.filter((c) => c !== id))
     : chosenChores.value.push(id);
+
+async function createHome() {
+  console.log("hello");
+  await home.createHome(houseName.value, chosenChores.value);
+}
 
 const chores = [
   {

@@ -55,9 +55,14 @@
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import HouseMembers from "../../components/House/HouseMembers.vue";
 import HouseChoreList from "../../components/House/HouseChoreList.vue";
+import { useHomeStore } from "../../stores/home";
+
+const home = useHomeStore();
+
+onMounted(async () => await home.getHome("t02smith", "myhome"));
 
 const homes = ref(["Home", "Parent's", "The Boys"]);
 

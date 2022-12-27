@@ -11,7 +11,13 @@ const password = ref("");
 const user = useUserStore();
 
 async function register() {
-  await user.register(username, password, fname, surname, email);
+  await user.register(
+    username.value,
+    password.value,
+    fname.value,
+    surname.value,
+    email.value
+  );
 }
 </script>
 
