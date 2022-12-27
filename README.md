@@ -53,6 +53,15 @@ docker build -t untitled-chore-app .
 docker run -p 80:80 untitled-chore-app
 ```
 
+## Deployment
+
+To deploy just follow [this tutorial](https://docs.docker.com/cloud/aci-integration/)
+
+```bash
+docker context create aci untitled-chore-api
+docker --context untitled-chore-api run -p 80:80 nginx
+```
+
 ## Testing
 
 To test run:

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from lib.auth.user import get_current_active_user
-from lib.db import chores, user as userDB, types, timetable
+from lib.db import chores, user as userDB, types, timetable, home
 from lib import err, io
 from typing import List
 from routes.username import house
@@ -9,7 +9,7 @@ router = APIRouter(prefix="/{username}")
 router.include_router(house.router)
 
 @router.get(
-    "/",
+    "",
     description="Gets information about a user",
     tags=["user"],
     response_model=types.UserOut,
@@ -32,7 +32,7 @@ async def get_user_info(
 
 
 @router.put(
-    "/",
+    "",
     description="Update a user's information",
     tags=["user"],
     response_model=types.UserOut,
@@ -100,3 +100,16 @@ async def upload_timetable(
 
     io.read_calendar(url)
     return "OK"
+
+@router.get(
+  "/homes",
+  tags=["home"],
+  description="Get a list of a user's homes",
+  response_model=List[types.Home],
+  status_code=200
+)
+async def get_homes(username: str, user: types.User = Depends(get_current_active_user)):
+  if username != user.username:
+    raise HTTPException(403, detail="You cannot access this user's homes")
+  
+  return await home.get_users_homes(user)

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from routes import chores
+from routes import chores, homes
 from routes.username import root as username
 from lib.db import types, db, user
 from lib.auth.user import get_current_active_user
@@ -12,7 +12,7 @@ from lib import err
 router = APIRouter(prefix="/api/v1")
 router.include_router(chores.router)
 router.include_router(username.router)
-
+router.include_router(homes.router)
 
 @router.post(
     "/login",
@@ -63,7 +63,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 async def register(userInfo: types.UserIn):
     # ? check format for username, password, email
     if not all(
-        [User.username_valid(userInfo.username), User.email_valid(userInfo.email)]
+        [types.User.username_valid(userInfo.username), types.User.email_valid(userInfo.email)]
     ):
         raise HTTPException(
             400, detail="Invalid format for username, email or password"
