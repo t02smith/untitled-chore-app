@@ -9,26 +9,15 @@
           type="button"
           id="dropdownMenuButton1"
           data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
+          aria-expanded="false">
           <font-awesome-icon icon="fa-solid fa-house" />
-          <strong> {{ chosenHome }} </strong>
+          <strong> {{ `${chosenHome ? chosenHome.creator : ""}/${chosenHome ? chosenHome.name : ""}` }} </strong>
         </button>
-        <ul
-          class="dropdown-menu dropdown-menu-dark"
-          aria-labelledby="dropdownMenuButton1"
-        >
-          <li
-            v-for="h in homes.filter((h) => h !== chosenHome)"
-            @click="chosenHome = h"
-          >
-            <a
-              class="dropdown-item d-flex align-items-center gap-2"
-              style="font-size: 1.5rem"
-              href="#"
-            >
+        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton1">
+          <li v-for="h in userHomes.filter((h) => h !== chosenHome.value)" @click="() => (chosenHome = h)">
+            <a class="dropdown-item d-flex align-items-center gap-2" style="font-size: 1rem" href="#">
               <font-awesome-icon icon="fa-solid fa-house" />
-              <strong>{{ h }}</strong></a
+              <strong>{{ h.creator }}/{{ h.name }}</strong></a
             >
             <hr />
           </li>
@@ -55,16 +44,19 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import HouseMembers from "../../components/House/HouseMembers.vue";
 import HouseChoreList from "../../components/House/HouseChoreList.vue";
 import { useHomeStore } from "../../stores/home";
 
 const home = useHomeStore();
+const userHomes = ref([]);
 
-onMounted(async () => await home.getHome("t02smith", "myhome"));
+onMounted(async () => (userHomes.value = await home.getHomes()));
+watch(userHomes, () => {
+  if (userHomes.value.length === 0) return;
+  chosenHome.value = userHomes.value[0];
+});
 
-const homes = ref(["Home", "Parent's", "The Boys"]);
-
-const chosenHome = ref("Home");
+const chosenHome = ref(null);
 </script>

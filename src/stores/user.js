@@ -1,24 +1,29 @@
-import { ref, watch, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
-import qs from "qs";
 
 export const useUserStore = defineStore("users", () => {
   const user = ref(null);
   const accessToken = ref(null);
 
-  // check if access token is stored
-  onMounted(() => (accessToken.value = localStorage.getItem("access_token")));
+  onMounted(() => {
+    const token = localStorage.getItem("access_token");
+    if (token === null) return;
+
+    accessToken.value = token;
+  });
+
+  watch(accessToken, () => {
+    localStorage.setItem("access_token", accessToken.value);
+  });
 
   async function login(username, password) {
-    const res = await axios.post(
-      `${import.meta.env.VITE_API_BASE}/login`,
-      `username=${username}&password=${password}`
-    );
+    const res = await axios.post(`${import.meta.env.VITE_API_BASE}/login`, `username=${username}&password=${password}`);
+
+    if (res.status !== 201) return;
 
     accessToken.value = res.data.access_token;
-    localStorage.setItem("access_token", res.data.access_token);
-    localStorage.setItem("access_token_expiry", red.data.expiry);
+    user.value = res.data.user;
   }
 
   async function register(username, password, firstName, surname, email) {

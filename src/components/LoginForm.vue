@@ -15,35 +15,18 @@ async function login() {
 </script>
 
 <template>
-  <form @submit.prevent="login">
-    <img
-      src="@/assets/logo.png"
-      alt="Image can't be displayed"
-      width="100"
-      height="auto"
-    />
+  <form @submit.prevent="login" v-if="!user.accessToken">
+    <img src="@/assets/logo.png" alt="Image can't be displayed" width="100" height="auto" />
 
     <h1 class="display-6">Sign in</h1>
 
     <div class="form-floating mb-3">
-      <input
-        type="text"
-        class="form-control"
-        id="username"
-        placeholder="tc3g20"
-        v-model="username"
-      />
+      <input type="text" class="form-control" id="username" placeholder="tc3g20" v-model="username" />
       <label for="username" class="form-label">Username</label>
     </div>
 
     <div class="form-floating mb-3">
-      <input
-        type="password"
-        class="form-control"
-        id="passwd"
-        placeholder="password101"
-        v-model="password"
-      />
+      <input type="password" class="form-control" id="passwd" placeholder="password101" v-model="password" />
       <label for="passwd" class="form-label">Password</label>
       <div id="accntHelp" class="form-text">
         Don't have an account?
