@@ -45,7 +45,7 @@ function setFaq(q, a) {
 
 <style scoped>
 img {
-    top: -50%;
+    top: -55%;
 }
 
 button.btn-light {
@@ -61,8 +61,10 @@ div.modal-body {
 }
 
 div.faq {
-    left: -50%;
+    left: 40%;
+    top: 50%;
     text-align: center;
+    padding: 2em;
 }
 
 h1 {
@@ -79,6 +81,6 @@ li {
     margin-bottom: 0.5em;
     color: white;
     font-size: 16px;
-    background: black;
+    background: #545353;
 }
 </style>

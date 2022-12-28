@@ -6,9 +6,7 @@ import Contact from "../components/Contact.vue";
 
 <template>
     <Navbar />
-
     <FAQ />
-
     <Contact />
 </template>
 

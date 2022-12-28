@@ -23,9 +23,9 @@ function sendMssg() {
 <style scoped>
 div.form {
     color: black;
-    left: 140%;
-    top: -44%;
+    left: 250%;
     text-align: center;
+    padding: 2em;
 }
 
 button {
