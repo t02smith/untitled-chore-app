@@ -10,6 +10,8 @@ async def create_chore(chore: types.ChoreIn, user: types.User) -> types.Chore:
             {
                 "name": chore.name,
                 "expected_time": chore.expected_time,
+                "difficulty": chore.difficulty,
+                "chore_score": chore.score,
                 "description": chore.description,
                 "public": chore.public,
                 "author": user.username,
@@ -25,7 +27,7 @@ async def get_chores_from_user(username: str, include_private: bool = False):
         container = await db.get_or_create_container(client, "chores")
         chores_res = container.query_items(
             f"""
-        SELECT c.id, c.name, c.author, c.expected_time, c.description, c.public
+        SELECT c.id, c.name, c.author, c.expected_time, c.difficulty, c.description, c.public
         FROM chores c
         WHERE c.author=@username {'' if include_private else 'AND c.public'}
       """,
@@ -65,6 +67,9 @@ async def update_chore(id: str, chore: types.ChoreIn, username: str):
                 "expected_time": chore.expected_time
                 if chore.expected_time != -1
                 else old.expected_time,
+                "difficulty": chore.difficulty
+                if chore.difficulty != -1
+                else old.difficulty,
                 "description": chore.description
                 if len(chore.description) > 0
                 else old.description,

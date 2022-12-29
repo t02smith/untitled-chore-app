@@ -44,6 +44,7 @@ async def register_user(user: types.UserIn):
                     "surname": user.surname,
                     "email": user.email,
                     "disabled": False,
+                    "score": 0,
                 },
                 enable_automatic_id_generation=True,
             )
@@ -69,6 +70,9 @@ async def update_user(old, updated: types.UserUpdate) -> types.UserOut:
                     if updated.surname is None
                     else updated.surname,
                     "disabled": old.disabled,
+                    "score": old.score
+                    if updated.score < 0
+                    else updated.score,
                 }
             )
         )

@@ -15,6 +15,7 @@ class User(BaseModel):
     first_name: str
     surname: str
     disabled: bool
+    score: int = 0
 
     @staticmethod
     def username_valid(username: str):
@@ -57,6 +58,8 @@ class Chore(BaseModel):
     author: str
     name: str
     expected_time: int
+    difficulty: int
+    score: int = expected_time * difficulty
     description: str
     public: bool
 
@@ -64,8 +67,13 @@ class Chore(BaseModel):
 class ChoreIn(BaseModel):
     name: str
     expected_time: int
+    difficulty: int
     description: str
     public: bool
+
+# ! LEADERBOARD
+#class Leaderboard(BaseModel):
+    
 
 
 # ! TIMETABLE
