@@ -16,7 +16,6 @@ router.include_router(homes.router)
 
 @router.post(
     "/login",
-    response_model=tokens.Token,
     description="Login using an existing account to untitled-chore-api",
     tags=["user", "auth"],
     status_code=201,
@@ -44,7 +43,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     access_token = tokens.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_Expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "user": types.UserOut(**user.__dict__)}
 
 
 @router.post(
@@ -70,11 +69,11 @@ async def register(userInfo: types.UserIn):
         )
 
     # ? create new user
-    await user.register_user(userInfo)
+    user = await user.register_user(userInfo)
 
     # * check access token
     access_token_Expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = tokens.create_access_token(
         data={"sub": userInfo.username}, expires_delta=access_token_Expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "user": user}

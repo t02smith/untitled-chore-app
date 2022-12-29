@@ -98,7 +98,6 @@ async def get_users_homes(user: types.User):
             WHERE ARRAY_CONTAINS (h['residents'], @username)
           """, parameters=[{"name": "@username", "value": user.username}],
         )
-
         return [types.Home(**h) async for h in res]
 
 

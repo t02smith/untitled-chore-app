@@ -35,7 +35,7 @@ async def register_user(user: types.UserIn):
             ],
         )
 
-        res = types.UserOut(
+        return types.UserOut(
             **await container.create_item(
                 {
                     "username": user.username,

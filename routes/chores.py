@@ -51,3 +51,12 @@ async def update_chore(
     id: str, chore: types.ChoreIn, user: types.User = Depends(get_current_active_user)
 ):
     return await chores.update_chore(id, chore, user.username)
+
+@router.get(
+  "/default",
+  description="Get a default set of chores",
+  response_model=List[types.Chore],
+  tags=["chores"]
+)
+async def get_default_chores():
+  return await chores.default_chores()

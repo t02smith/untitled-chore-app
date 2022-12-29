@@ -1,0 +1,44 @@
+[
+  {
+    "id": "default-0",
+    "name": "Clean the Shower",
+    "room": "Bathroom",
+    "color": "#0ac",
+    "icon": "fa fa-shower"
+  },
+  {
+    "id": "default-1",
+    "name": "Do the Dishes",
+    "room": "Kitchen",
+    "color": "#F24E1E",
+    "icon": "fa-solid fa-kitchen-set"
+  },
+  {
+    "id": "default-2",
+    "name": "Hoover",
+    "room": "Living Room",
+    "color": "#0FA958",
+    "icon": "fa-solid fa-couch"
+  },
+  {
+    "id": "default-3",
+    "name": "Take the Bins Out",
+    "room": "Kitchen",
+    "color": "#F24E1E",
+    "icon": "fa-solid fa-kitchen-set"
+  },
+  {
+    "id": "default-4",
+    "name": "Tidy Up",
+    "room": "Living Room",
+    "color": "#0FA958",
+    "icon": "fa-solid fa-couch"
+  },
+  {
+    "id": "default-5",
+    "name": "Clean the Toilet",
+    "room": "Bathroom",
+    "color": "#0ac",
+    "icon": "fa fa-shower"
+  }
+]

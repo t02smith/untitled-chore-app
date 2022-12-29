@@ -14,3 +14,13 @@ router = APIRouter(prefix="/homes")
 )
 async def create_home(newHome: types.HomeIn, user: types.User = Depends(get_current_active_user)):
   return await home.create_home(newHome, user)
+
+@router.get(
+  "/",
+  tags=["home"],
+  description="Get a list of a user's homes",
+  response_model=List[types.Home],
+  status_code=200
+)
+async def get_homes(user: types.User = Depends(get_current_active_user)): 
+  return await home.get_users_homes(user)
