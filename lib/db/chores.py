@@ -74,3 +74,13 @@ async def update_chore(id: str, chore: types.ChoreIn, username: str):
         )
 
         return types.Chore(**res)
+
+async def default_chores():
+  async with db.get_client() as client:
+    container = await db.get_or_create_container(client, "chores")
+    return [c async for c in container.query_items(
+      """
+        SELECT TOP 6 *
+        FROM chores c
+        WHERE c.id LIKE 'default-%'
+      """ )]

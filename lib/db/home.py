@@ -46,7 +46,11 @@ async def get_home_by_creator_and_name(
     )
 
 
-# TODO Check home doesnt exist
+async def get_home_residents(creator: str, home_name: str, caller: types.User):
+  home = await get_home_by_creator_and_name(creator, home_name, caller)
+  return await user.get_users_by_username_from_list(home.residents)
+
+
 async def create_home(home: types.HomeIn, user: types.User):
     async with db.get_client() as client:
         container_homes = await db.get_or_create_container(client, "homes")

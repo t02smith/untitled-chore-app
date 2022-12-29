@@ -7,6 +7,13 @@ Run the application and head to [http://localhost/docs](http://localhost/docs)
 - [FastAPI docs](https://fastapi.tiangolo.com/)
 - [Poetry Basic Usage](https://python-poetry.org/docs/basic-usage/)
 
+## Installation (for testing)
+
+1. Download the [Cosmos DB emulator](https://learn.microsoft.com/en-us/azure/cosmos-db/local-emulator-release-notes)
+2. Setup containers called `chores`, `homes`, `timetables`, and `users`
+3. Upload the default chore list in [./data/default_chores.json](./data/default_chores.json) to the chores container
+4. Follow the run instructions below 
+
 ## How to run
 
 ### Poetry

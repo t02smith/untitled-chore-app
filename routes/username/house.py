@@ -70,6 +70,15 @@ async def get_home_timetable(username: str, house_name: str, user: types.User = 
 async def complete_task(username: str, house_name: str, chore_id: str, user: types.User = Depends(userAuth.get_current_active_user)):
   return await timetable.complete_task(username, house_name, chore_id, user)
 
+@router.get(
+  "/residents",
+  description="Get details about a home's residents",
+  tags=["home"],
+  status_code=200,
+  response_model=List[types.UserOut]
+)
+async def get_home_residents(username: str, house_name: str, user: types.User = Depends(userAuth.get_current_active_user)):
+  return await home.get_home_residents(username, house_name, user)
 
 # ! CHORES
 
