@@ -5,6 +5,7 @@
 <template>
     <div class="changeEmail">
         
+        <h1 class="display-6">Change Email</h1>
         <div class="mb-3">
             <label for="formGroupExampleInput2" class="form-label">New Email</label>
             <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="New Email">
