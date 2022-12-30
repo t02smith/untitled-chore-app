@@ -15,7 +15,7 @@ async function login() {
 </script>
 
 <template>
-  <form @submit.prevent="login" v-if="!user.accessToken">
+  <form @submit.prevent="login" v-if="user.accessToken.value === null">
     <img src="@/assets/logo.png" alt="Image can't be displayed" width="100" height="auto" />
 
     <h1 class="display-6">Sign in</h1>
@@ -36,6 +36,8 @@ async function login() {
 
     <button type="submit" class="btn btn-primary">Log in</button>
   </form>
+
+  <div v-else>You are already logged in</div>
 </template>
 
 <style scoped>

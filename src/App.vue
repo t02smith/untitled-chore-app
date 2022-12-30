@@ -10,12 +10,8 @@ const user = useUserStore();
   <div>
     <NavBar />
 
-    <div v-if="!user.user">
-      <LoginForm />
-    </div>
-
     <!-- Displays current route -->
-    <router-view v-else></router-view>
+    <router-view></router-view>
   </div>
 </template>
 

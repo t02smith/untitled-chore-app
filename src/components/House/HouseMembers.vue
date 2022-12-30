@@ -1,45 +1,31 @@
 <template>
   <div>
-    <h3 class="text-primary">Your housemates:</h3>
+    <h3 class="text-primary">Your house:</h3>
     <ul class="list-group list-group-flush bg-dark">
       <li
-        v-for="user in members"
-        class="list-group-item bg-dark text-light row d-flex"
-      >
-        <p
-          class="col-3 text-primary"
-          style="font-size: 1.5rem; font-weight: bold"
-        >
-          {{ user.choresLeft }} to go
-        </p>
-        <div class="fw-bold col-3" style="font-size: 1.6rem">
+        v-if="residents"
+        v-for="user in residents"
+        class="list-group-item bg-dark text-light row d-flex align-items-center">
+        <div class="fw-bold col-6" style="font-size: 1.4rem">
           {{ user.username }}
         </div>
-        <p class="col-6" style="font-size: 1.1rem">
-          {{ "⭐".repeat(user.score) }}
+        <p class="col-6 ms-auto" style="font-size: 1rem">
+          {{ "⭐".repeat(3) }}
         </p>
       </li>
+
+      <div v-else class="p-1 bg-dark rounded" style="border-collapse: separate">
+        <p class="p-2">loading residents...</p>
+      </div>
     </ul>
   </div>
 </template>
 <script setup>
-const members = [
-  {
-    username: "t02smith",
-    score: 8,
-    choresLeft: 3,
+const props = defineProps({
+  residents: {
+    default: null,
   },
-  {
-    username: "tcs1g20",
-    score: 5,
-    choresLeft: 6,
-  },
-  {
-    username: "jaret",
-    score: 9,
-    choresLeft: 0,
-  },
-];
+});
 </script>
 <style scoped>
 p {
