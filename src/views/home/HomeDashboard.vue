@@ -27,8 +27,17 @@
         </ul>
       </div>
 
-      <div style="margin-left: auto">
-        <a :href="`/home/settings?home=${chosenHome}`">
+      <div style="margin-left: auto" class="d-flex align-items-center gap-4">
+        <button
+          v-if="chosenHome"
+          type="button"
+          class="btn btn-secondary"
+          data-bs-toggle="modal"
+          data-bs-target="#invite-link">
+          Invite
+        </button>
+
+        <a :href="`/home/settings?home=`">
           <font-awesome-icon icon="fa-solid fa-gear" style="font-size: 2rem" />
         </a>
       </div>
@@ -44,6 +53,18 @@
         <div class="col"></div>
       </div>
     </div>
+
+    <div
+      v-if="chosenHome"
+      class="modal fade"
+      id="invite-link"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" style="width: fit-content; min-width: 60%">
+        <HouseInvite :creator="chosenHome.creator" :homeName="chosenHome.name" />
+      </div>
+    </div>
   </div>
 </template>
 <script setup>
@@ -52,6 +73,7 @@ import HouseMembers from "../../components/House/HouseMembers.vue";
 import HouseChoreList from "../../components/House/HouseChoreList.vue";
 import { useHomeStore } from "../../stores/home";
 import { useUserStore } from "../../stores/user";
+import HouseInvite from "../../components/House/HouseInvite.vue";
 
 const home = useHomeStore();
 const user = useUserStore();

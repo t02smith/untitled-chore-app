@@ -65,30 +65,7 @@
     </form>
   </div>
 
-  <div class="container p-4" v-else>
-    <div class="jumbotron bg-dark p-4 my-4 shadow rounded">
-      <h1 class="display-2 text-primary font-weight-bold">Home Created!</h1>
-      <p class="lead" v-if="!inviteLink">Generating the invite details for your new home...</p>
-
-      <div class="lead" v-else>
-        <h4>Invite details:</h4>
-
-        <p>
-          House creator: <strong class="text-success"> {{ homeCreated.creator }} </strong>
-          <br />
-          House name: <strong class="text-success">{{ homeCreated.name }}</strong>
-        </p>
-
-        <p>
-          Invite id: <strong class="text-success">{{ inviteLink.id }}</strong>
-          <br />
-          <i class="text-muted text-sm"
-            >expires on <strong class="text-success"> {{ inviteLink.expiry }}</strong></i
-          >
-        </p>
-      </div>
-    </div>
-  </div>
+  <HouseInvite v-else :creator="homeCreated.creator" :homeName="homeCreated.name" title="Home Created!" />
 </template>
 <script setup>
 import { ref, onMounted } from "vue";
@@ -96,6 +73,7 @@ import ChoreCard from "../../components/ChoreCard.vue";
 import { useHomeStore } from "../../stores/home";
 import { useChoreStore } from "../../stores/chores";
 import { useUserStore } from "../../stores/user";
+import HouseInvite from "../../components/House/HouseInvite.vue";
 
 const home = useHomeStore();
 const chores = useChoreStore();

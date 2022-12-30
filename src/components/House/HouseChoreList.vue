@@ -6,9 +6,11 @@ div
       <h3 style="margin-left: auto" class="text-muted">3 days left</h3>
     </div>
 
-    <div class="d-flex flex-column gap-1" v-if="props.timetable">
+    <div class="d-flex flex-column gap-1" v-if="props.timetable && user.user">
       <ChoreCard
-        v-for="c in props.timetable.tasks.filter((t) => !t.complete)"
+        v-for="c in props.timetable.tasks
+          .filter((t) => !t.complete)
+          .sort((a, b) => (a.assigned_to < b.assigned_to ? -1 : 1))"
         :name="c.chore.name"
         :username="c.assigned_to"
         room="bathroom"
@@ -22,7 +24,17 @@ div
   </div>
 </template>
 <script setup>
+import { onMounted } from "vue";
+import { useHomeStore } from "../../stores/home";
+import { useUserStore } from "../../stores/user";
 import ChoreCard from "../ChoreCard.vue";
+
+const user = useUserStore();
+const home = useHomeStore();
+
+onMounted(() => {
+  if (!user.user) user.getUserData();
+});
 
 const props = defineProps({
   timetable: {

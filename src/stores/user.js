@@ -20,6 +20,18 @@ export const useUserStore = defineStore("users", () => {
     localStorage.setItem("access_token", accessToken.value);
   });
 
+  async function getUserData() {
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE}/me`, {
+      headers: { Authorization: `Bearer ${accessToken.value}` },
+      validateStatus: () => true,
+    });
+
+    if (!handleResponse(res, 200)) return null;
+
+    user.value = res.data;
+    return res.data;
+  }
+
   async function login(username, password) {
     const res = await axios.post(
       `${import.meta.env.VITE_API_BASE}/login`,
@@ -53,5 +65,5 @@ export const useUserStore = defineStore("users", () => {
     return true;
   }
 
-  return { user, login, accessToken, register, error };
+  return { user, login, accessToken, register, error, getUserData };
 });
