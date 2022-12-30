@@ -1,18 +1,10 @@
 import axios from "axios";
 import { defineStore } from "pinia";
 import { useUserStore } from "./user";
+import { handleResponse } from "./util";
 
 export const useHomeStore = defineStore("homes", () => {
   const user = useUserStore();
-
-  function handleResponse(response, expectedStatus) {
-    if (response.status === 401) {
-      user.accessToken = null;
-    }
-
-    if (response.status !== expectedStatus) return null;
-    return response.data;
-  }
 
   async function getHome(creator, homeName) {
     const res = await axios.get(`${import.meta.env.VITE_API_BASE}/${creator}/${homeName}`, {
@@ -52,7 +44,7 @@ export const useHomeStore = defineStore("homes", () => {
   }
 
   async function createInviteLink(creator, homeName) {
-    const res = await axios.post(`${import.meta.env.VITE_API_BASE}/${creator}/${homeName}/invite`, {
+    const res = await axios.post(`${import.meta.env.VITE_API_BASE}/${creator}/${homeName}/invite`, null, {
       headers: { Authorization: `Bearer ${user.accessToken}` },
       validateStatus: () => true,
     });

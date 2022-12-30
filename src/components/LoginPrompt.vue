@@ -12,7 +12,7 @@
   </div>
 </template>
 <script setup>
-import { RouterLink, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 </script>
