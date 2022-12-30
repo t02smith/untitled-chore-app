@@ -75,7 +75,12 @@ class TimetabledChore(BaseModel):
     chore_id: str
     user_id: str
     complete: bool = False
-
+    
+    
+class TimetabledChoreOut(BaseModel):
+    chore: Chore
+    assigned_to: str
+    complete: bool
 
 # a timetable for a house for a given week
 class Timetable(BaseModel):
@@ -84,6 +89,12 @@ class Timetable(BaseModel):
     start: str
     end: str
     tasks: List[TimetabledChore]
+    
+    
+class TimetableOut(BaseModel):
+    start: str
+    end: str
+    tasks: List[TimetabledChoreOut]
     
     
 class UserTimetableChore(BaseModel):

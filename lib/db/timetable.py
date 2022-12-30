@@ -2,12 +2,15 @@ from lib.db import user, home as homeDB, db, chores, types
 from fastapi import HTTPException
 from datetime import datetime, timedelta
 from starlette.responses import RedirectResponse
+from typing import List
 
-async def get_or_generate_timetable(home_creator: str, home_name: str, caller: types.User) -> types.Timetable:
+async def get_or_generate_timetable(home_creator: str, home_name: str, caller: types.User) -> types.TimetableOut:
     home = await homeDB.get_home_by_creator_and_name(home_creator, home_name, caller)
     existing_timetable = await get_homes_timetable(home.id)
+    
+    # ? timetable exists and is still in date
     if existing_timetable is not None and existing_timetable.end > datetime.now().isoformat():
-      return existing_timetable
+      return await timetable_to_timetableOut(existing_timetable)
     
     chore_objs = await chores.get_chores_by_id_from_list(home.chores)
     
@@ -34,15 +37,25 @@ async def get_or_generate_timetable(home_creator: str, home_name: str, caller: t
       if existing_timetable is not None:
         await container.delete_item(existing_timetable.id, existing_timetable.id)
       
-      return types.Timetable(**await container.create_item({
+      return await timetable_to_timetableOut(types.Timetable(**await container.create_item({
           "home_id": timetable.home_id,
           "start": timetable.start,
           "end": timetable.end,
           "tasks": list(map(lambda t: t.__dict__, timetable.tasks)) 
-      }, enable_automatic_id_generation=True))
+      }, enable_automatic_id_generation=True)), chore_objs=chore_objs)    
+  
+async def timetable_to_timetableOut(timetable: types.Timetable, chore_objs: List[types.Chore] = None) -> types.TimetableOut:
+  
+  if chore_objs is None:
+    chore_objs = await chores.get_chores_by_id_from_list(list(map(lambda t: t.chore_id, timetable.tasks)))
       
-    # TODO remove old timetable from database
-      
+  return types.TimetableOut(
+    start=timetable.start,
+    end=timetable.end,
+    tasks=list(map(
+      lambda task: types.TimetabledChoreOut(chore=task[0], assigned_to=task[1].user_id, complete=task[1].complete ), 
+      zip(chore_objs, timetable.tasks)))
+  )
       
 async def get_homes_timetable(home_id: str) -> types.Timetable | None:
   async with db.get_client() as client:

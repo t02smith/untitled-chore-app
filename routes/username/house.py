@@ -40,7 +40,7 @@ async def update_home(
   tags=["home"],
   description="Get this week's chore timetable or generate one if it doesn't exist or is expired",
   status_code=200,
-  response_model=types.Timetable,
+  response_model=types.TimetableOut,
   responses={
     403: {"description": "You do not have permission to view this timetable", "model": err.HTTPError},
     404: {"description": "House not found", "model": err.HTTPError}
