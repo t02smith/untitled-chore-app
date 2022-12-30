@@ -6,6 +6,8 @@ from typing import List
 from pydantic import BaseModel
 from fastapi import HTTPException
 
+MAX_HOMES = 5
+
 # * GETTERS
 
 
@@ -52,26 +54,21 @@ async def get_home_residents(creator: str, home_name: str, caller: types.User):
 
 
 async def create_home(home: types.HomeIn, user: types.User):
+    user_homes = await get_users_homes(user)
+    if len(user_homes) == MAX_HOMES:
+      raise HTTPException(400, detail="Max number of homes already created")
+    
+    if home.name in list(map(lambda h: h.name, user_homes)):
+      raise HTTPException(400, detail="user already has a home with this name")
+    
     async with db.get_client() as client:
         container_homes = await db.get_or_create_container(client, "homes")
         container_users = await db.get_or_create_container(client, "users")
 
-        users_res = container_users.query_items(
-            """
-      SELECT u.username
-      FROM users u
-      WHERE ARRAY_CONTAINS(@username, u.username)
-      """,
-            parameters=[{"name": "@username", "value": home.residents}],
-        )
-
-        res = [u["username"] async for u in users_res]
-
-        res.append(user.username)
         res = await container_homes.create_item(
             {
               "name": home.name,
-              "residents": res,
+              "residents": [ user.username ],
               "chores": [] if home.chores is None else home.chores,
               "creator": user.username,
               "invite_link": None,
@@ -91,7 +88,7 @@ async def update_home(
         return types.Home(**await container_homes.upsert_item(home.__dict__))
 
 
-async def get_users_homes(user: types.User):
+async def get_users_homes(user: types.User) -> List[types.Home]:
     async with db.get_client() as client:
         container = await db.get_or_create_container(client, "homes")
 

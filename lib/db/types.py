@@ -149,7 +149,6 @@ class HomeFull:
 
 class HomeIn(BaseModel):
     name: str
-    residents: List[str] | None = None
     chores: List[str] | None = None
 
 

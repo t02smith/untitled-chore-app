@@ -69,11 +69,11 @@ async def register(userInfo: types.UserIn):
         )
 
     # ? create new user
-    user = await user.register_user(userInfo)
+    new_user = await user.register_user(userInfo)
 
     # * check access token
     access_token_Expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = tokens.create_access_token(
         data={"sub": userInfo.username}, expires_delta=access_token_Expires
     )
-    return {"access_token": access_token, "token_type": "bearer", "user": user}
+    return {"access_token": access_token, "token_type": "bearer", "user": new_user}
