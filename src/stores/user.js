@@ -1,10 +1,13 @@
 import { ref, onMounted, watch } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
+import { handleResponse } from "./util";
 
 export const useUserStore = defineStore("users", () => {
   const user = ref(null);
   const accessToken = ref(null);
+
+  const error = ref(null);
 
   onMounted(() => {
     const token = localStorage.getItem("access_token");
@@ -24,7 +27,7 @@ export const useUserStore = defineStore("users", () => {
       { validateStatus: () => true }
     );
 
-    if (res.status !== 201) return false;
+    if (!handleResponse(res, 201)) return null;
 
     accessToken.value = res.data.access_token;
     user.value = res.data.user;
@@ -50,5 +53,5 @@ export const useUserStore = defineStore("users", () => {
     return true;
   }
 
-  return { user, login, accessToken, register };
+  return { user, login, accessToken, register, error };
 });

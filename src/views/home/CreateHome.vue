@@ -95,9 +95,11 @@ import { ref, onMounted } from "vue";
 import ChoreCard from "../../components/ChoreCard.vue";
 import { useHomeStore } from "../../stores/home";
 import { useChoreStore } from "../../stores/chores";
+import { useUserStore } from "../../stores/user";
 
 const home = useHomeStore();
 const chores = useChoreStore();
+const user = useUserStore();
 
 const defaultChores = ref(null);
 const userHomes = ref([]);
@@ -122,6 +124,7 @@ async function createHome() {
 }
 
 onMounted(async () => {
+  if (user.accessToken === null) return;
   chores.getDefaultChores().then((data) => (defaultChores.value = data));
   home.getHomes().then((data) => {
     if (data === null) return;
