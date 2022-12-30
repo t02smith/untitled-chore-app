@@ -1,14 +1,20 @@
 <script setup>
-import LoginForm from "./components/LoginForm.vue";
 import NavBar from "./components/NavBar.vue";
+import LoginPrompt from "./components/LoginPrompt.vue";
 import { useUserStore } from "./stores/user";
+import { useRoute } from "vue-router";
+import { computed } from "vue";
 
 const user = useUserStore();
+const route = useRoute();
+const path = computed(() => route.path);
 </script>
 
 <template>
   <div>
     <NavBar />
+
+    <LoginPrompt v-if="!user.accessToken && path !== '/login' && path !== '/register'" />
 
     <!-- Displays current route -->
     <router-view></router-view>

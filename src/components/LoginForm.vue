@@ -1,21 +1,25 @@
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import { useUserStore } from "../stores/user";
 
 const user = useUserStore();
+const router = useRouter();
 
 const username = ref("");
 const password = ref("");
 
 async function login() {
   if (username.value.length > 0 && password.value.length > 0) {
-    await user.login(username.value, password.value);
+    const res = await user.login(username.value, password.value);
+
+    if (res) router.back();
   }
 }
 </script>
 
 <template>
-  <form @submit.prevent="login" v-if="user.accessToken.value === null">
+  <form @submit.prevent="login" v-if="!user.accessToken || user.accessToken.value === null">
     <img src="@/assets/logo.png" alt="Image can't be displayed" width="100" height="auto" />
 
     <h1 class="display-6">Sign in</h1>

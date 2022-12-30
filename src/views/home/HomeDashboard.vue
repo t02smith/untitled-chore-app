@@ -51,8 +51,10 @@ import { ref, onMounted, watch } from "vue";
 import HouseMembers from "../../components/House/HouseMembers.vue";
 import HouseChoreList from "../../components/House/HouseChoreList.vue";
 import { useHomeStore } from "../../stores/home";
+import { useUserStore } from "../../stores/user";
 
 const home = useHomeStore();
+const user = useUserStore();
 
 const userHomes = ref([]);
 
@@ -60,7 +62,10 @@ const chosenHome = ref(null);
 const homeResidents = ref(null);
 const homeTimetable = ref(null);
 
-onMounted(async () => (userHomes.value = await home.getHomes()));
+onMounted(async () => {
+  if (user.accessToken === null) return;
+  userHomes.value = await home.getHomes();
+});
 
 watch(userHomes, () => {
   if (userHomes.value === null || userHomes.value.length === 0) return;
