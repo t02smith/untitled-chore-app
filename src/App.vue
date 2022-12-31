@@ -1,5 +1,5 @@
 <script setup>
-import NavBar from "./components/NavBar.vue";
+import NavBar from "./components/Navbar.vue";
 import LoginPrompt from "./components/LoginPrompt.vue";
 import { useUserStore } from "./stores/user";
 import { useRoute } from "vue-router";
