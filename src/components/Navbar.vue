@@ -9,8 +9,7 @@
 
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <router-link to="/home" class="nav-link" tag="link">Home</router-link>
-                    <router-link to="/group" class="nav-link" tag="link">Group</router-link>
+                    <router-link to="/home/dashboard" class="nav-link" tag="link">Home</router-link>
                     <router-link to="/chores" class="nav-link" tag="link">Chores</router-link>
                     <router-link to="/help" class="nav-link" tag="link">Help</router-link>
                 </div>
@@ -31,7 +30,7 @@
 div.navbar-nav {
     /* This is extremely jank must change lol */
     /* Centering not working properly otherwise */
-    left: 20%;
+    left: 25%;
 }
 
 div.navbar-nav :link {

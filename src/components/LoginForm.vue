@@ -1,52 +1,51 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useDetails } from "@/stores/userDetails"
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useUserStore } from "../stores/user";
 
+const user = useUserStore();
 const router = useRouter();
-const uname = ref("")
-const pwd = ref("")
 
-function login() {
-    // send off to API:
-        // POST req. to URL of azure func. "https://blah"
-        // uname.value
-        // pwd.value
-        // console.log('[LOGIN] ' + uname.value + ' logged in')
+const username = ref("");
+const password = ref("");
 
-    // store in pinia
-    const detailsStore = useDetails() // access pinia through the instance
-    detailsStore.setDetails(uname.value, pwd.value);
-    
-    // TO REMOVE
-    console.log('[LOGIN] Username: ' + uname.value);
-    router.push({ path: '/home' });
+async function login() {
+  if (username.value.length > 0 && password.value.length > 0) {
+    const res = await user.login(username.value, password.value);
+
+    if (res) router.back();
+  }
 }
 </script>
 
 <template>
-    <div class="form">
-        <img src="@/assets/logo.png" alt="Image can't be displayed" width="85" height="85">
+  <form @submit.prevent="login" v-if="!user.accessToken || user.accessToken.value === null">
+    <img src="@/assets/logo.png" alt="Image can't be displayed" width="100" height="auto" />
 
-        <h1 class="display-6">Sign in</h1>
+    <h1 class="display-6">Sign in</h1>
 
-        <div class="form-floating mb-3">
-            <input v-model="uname" type="text" class="form-control" id="username" placeholder="tc3g20">
-            <label for="username" class="form-label">Username</label>
-        </div>
-
-        <div class="form-floating mb-3">
-            <input v-model="pwd" type="password" class="form-control" id="passwd" placeholder="password101">
-            <label for="passwd" class="form-label">Password</label>
-            <div id="accntHelp" class="form-text">Don't have an account? <router-link to="/register">Register</router-link></div>
-        </div>
-
-        <button @click="login" class="btn btn-primary">Log in</button>
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="username" placeholder="tc3g20" v-model="username" />
+      <label for="username" class="form-label">Username</label>
     </div>
+
+    <div class="form-floating mb-3">
+      <input type="password" class="form-control" id="passwd" placeholder="password101" v-model="password" />
+      <label for="passwd" class="form-label">Password</label>
+      <div id="accntHelp" class="form-text">
+        Don't have an account?
+        <router-link to="/register">Register</router-link>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Log in</button>
+  </form>
+
+  <div v-else>You are already logged in</div>
 </template>
 
 <style scoped>
-div.form {
+form {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -65,4 +64,5 @@ h1 {
     color: white;
     font-size: 32px;
 }
+
 </style>
