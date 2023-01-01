@@ -10,6 +10,7 @@ export const useHomeStore = defineStore("homes", () => {
     const res = await axios.get(`${import.meta.env.VITE_API_BASE}/${creator}/${homeName}`, {
       headers: { Authorization: `Bearer ${user.accessToken}` },
       validateStatus: () => true,
+      withCredentials: true,
     });
 
     return handleResponse(res, 200);
@@ -19,6 +20,7 @@ export const useHomeStore = defineStore("homes", () => {
     const res = await axios.get(`${import.meta.env.VITE_API_BASE}/homes/`, {
       headers: { Authorization: `Bearer ${user.accessToken}` },
       validateStatus: () => true,
+      withCredentials: true,
     });
 
     return handleResponse(res, 200);
@@ -28,17 +30,22 @@ export const useHomeStore = defineStore("homes", () => {
     const res = await axios.post(
       `${import.meta.env.VITE_API_BASE}/homes`,
       { name: homeName, chores: chores },
-      { headers: { Authorization: `Bearer ${user.accessToken}` } }
+      { headers: { Authorization: `Bearer ${user.accessToken}` }, withCredentials: true }
     );
 
     return handleResponse(res, 201);
   }
 
   async function joinHome(creator, homeName, inviteId) {
-    const res = await axios.put(`${import.meta.env.VITE_API_BASE}/${creator}/${homeName}/join?invite_id=${inviteId}`, {
-      headers: { Authorization: `Bearer ${user.accessToken}` },
-      validateStatus: () => true,
-    });
+    const res = await axios.put(
+      `${import.meta.env.VITE_API_BASE}/${creator}/${homeName}/join?invite_id=${inviteId}`,
+      null,
+      {
+        headers: { Authorization: `Bearer ${user.accessToken}` },
+        validateStatus: () => true,
+        withCredentials: true,
+      }
+    );
 
     return handleResponse(res, 200);
   }
@@ -47,6 +54,7 @@ export const useHomeStore = defineStore("homes", () => {
     const res = await axios.post(`${import.meta.env.VITE_API_BASE}/${creator}/${homeName}/invite`, null, {
       headers: { Authorization: `Bearer ${user.accessToken}` },
       validateStatus: () => true,
+      withCredentials: true,
     });
 
     return handleResponse(res, 201);
@@ -56,6 +64,7 @@ export const useHomeStore = defineStore("homes", () => {
     const res = await axios.get(`${import.meta.env.VITE_API_BASE}/${creator}/${homeName}/chores`, {
       headers: { Authorization: `Bearer ${user.accessToken}` },
       validateStatus: () => true,
+      withCredentials: true,
     });
 
     return handleResponse(res, 200);
@@ -65,6 +74,7 @@ export const useHomeStore = defineStore("homes", () => {
     const res = await axios.get(`${import.meta.env.VITE_API_BASE}/${creator}/${homeName}/residents`, {
       headers: { Authorization: `Bearer ${user.accessToken}` },
       validateStatus: () => true,
+      withCredentials: true,
     });
 
     return handleResponse(res, 200);
@@ -74,6 +84,7 @@ export const useHomeStore = defineStore("homes", () => {
     const res = await axios.put(`${import.meta.env.VITE_API_BASE}/${creator}/${homeName}/timetable`, null, {
       headers: { Authorization: `Bearer ${user.accessToken}` },
       validateStatus: () => true,
+      withCredentials: true,
     });
 
     return handleResponse(res, 200);
@@ -86,6 +97,7 @@ export const useHomeStore = defineStore("homes", () => {
       {
         headers: { Authorization: `Bearer ${user.accessToken}` },
         validateStatus: () => true,
+        withCredentials: true,
       }
     );
 

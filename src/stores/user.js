@@ -2,6 +2,9 @@ import { ref, onMounted, watch } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 import { handleResponse } from "./util";
+import { useCookies } from "vue3-cookies";
+
+const { cookies } = useCookies();
 
 export const useUserStore = defineStore("users", () => {
   const user = ref(null);
@@ -10,14 +13,11 @@ export const useUserStore = defineStore("users", () => {
   const error = ref(null);
 
   onMounted(() => {
-    const token = localStorage.getItem("access_token");
+    const token = cookies.get("access_token");
+    console.log(token);
     if (token === null) return;
 
     accessToken.value = token;
-  });
-
-  watch(accessToken, () => {
-    localStorage.setItem("access_token", accessToken.value);
   });
 
   async function getUserData() {
@@ -36,7 +36,7 @@ export const useUserStore = defineStore("users", () => {
     const res = await axios.post(
       `${import.meta.env.VITE_API_BASE}/login`,
       `username=${username}&password=${password}`,
-      { validateStatus: () => true }
+      { validateStatus: () => true, withCredentials: true }
     );
 
     if (!handleResponse(res, 201)) return null;
@@ -56,7 +56,7 @@ export const useUserStore = defineStore("users", () => {
         surname: surname,
         email: email,
       },
-      { validateStatus: () => true }
+      { validateStatus: () => true, withCredentials: true }
     );
 
     if (res.status !== 201) return false;

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <!-- Home choice and home options -->
     <div class="py-4 px-5 d-flex align-items-center">
       <div class="dropdown">
@@ -37,6 +37,8 @@
           Invite
         </button>
 
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#join-home">Join</button>
+
         <a :href="`/home/settings?home=`">
           <font-awesome-icon icon="fa-solid fa-gear" style="font-size: 2rem" />
         </a>
@@ -46,11 +48,9 @@
     <!-- Page content -->
     <div class="container-fluid px-5">
       <div class="row">
-        <HouseMembers class="col" :residents="homeResidents" />
+        <HouseMembers class="col-4" :residents="homeResidents" />
 
-        <HouseChoreList class="col-6" :timetable="homeTimetable" />
-
-        <div class="col"></div>
+        <HouseChoreList class="col-8" :timetable="homeTimetable" />
       </div>
     </div>
 
@@ -65,18 +65,27 @@
         <HouseInvite :creator="chosenHome.creator" :homeName="chosenHome.name" />
       </div>
     </div>
+
+    <div class="modal fade" id="join-home" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" style="width: fit-content; min-width: 60%">
+        <JoinHouse />
+      </div>
+    </div>
   </div>
 </template>
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import HouseMembers from "../../components/House/HouseMembers.vue";
 import HouseChoreList from "../../components/House/HouseChoreList.vue";
+import JoinHouse from "../../components/House/JoinHouse.vue";
 import { useHomeStore } from "../../stores/home";
 import { useUserStore } from "../../stores/user";
 import HouseInvite from "../../components/House/HouseInvite.vue";
+import { useRouter } from "vue-router";
 
 const home = useHomeStore();
 const user = useUserStore();
+const router = useRouter();
 
 const userHomes = ref([]);
 
