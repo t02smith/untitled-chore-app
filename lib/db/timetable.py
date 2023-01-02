@@ -1,4 +1,4 @@
-from lib.db import user, home as homeDB, db, chores, types
+from lib.db import user as userDB, home as homeDB, db, chores, types
 from fastapi import HTTPException
 from datetime import datetime, timedelta
 from starlette.responses import RedirectResponse
@@ -86,6 +86,8 @@ async def get_users_timetable(user: types.User) -> types.UserTimetable:
   
 async def complete_task(username: str, house_name: str, chore_id: str, user: types.User):
   home = await homeDB.get_home_by_creator_and_name(username, house_name, user)
+  user = await userDB.get_user_by_username(username)
+  
   async with db.get_client() as client:
     container = await db.get_or_create_container(client, "timetables")
     timetable = await get_homes_timetable(home.id)
@@ -104,6 +106,9 @@ async def complete_task(username: str, house_name: str, chore_id: str, user: typ
       raise HTTPException(400, detail="This chore is already complete")
     
     chore.complete = True
+    #await userDB.update_user(user, )
+    #TODO: implement increase user score based on chore score
+
     await container.upsert_item({
       "id": timetable.id,
       "home_id": timetable.home_id,
