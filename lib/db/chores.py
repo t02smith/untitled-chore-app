@@ -11,10 +11,11 @@ async def create_chore(chore: types.ChoreIn, user: types.User) -> types.Chore:
                 "name": chore.name,
                 "expected_time": chore.expected_time,
                 "difficulty": chore.difficulty,
-                "chore_score": chore.expected_time * chore.difficulty,
+                "score": chore.expected_time * chore.difficulty,
                 "description": chore.description,
                 "public": chore.public,
                 "author": user.username,
+                "room": chore.room
             },
             enable_automatic_id_generation=True,
         )

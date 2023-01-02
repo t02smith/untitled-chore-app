@@ -25,7 +25,7 @@ async def get_or_generate_timetable(home_creator: str, home_name: str, caller: t
     for c in sorted_chores:
       residents = sorted(residents, key=lambda u: u[1]) # TODO sort by chore score
       timetable.tasks.append(types.TimetabledChore(chore_id=c.id, user_id=residents[0][0]))
-      residents[0][1] += c.expected_time
+      residents[0][1] += c.expected_time # assigns chores to users
     
     # ? write timetable to database
     async with db.get_client() as client:

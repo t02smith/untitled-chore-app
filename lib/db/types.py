@@ -6,10 +6,9 @@ from dataclasses import dataclass
 
 # ! USER
 
-class UserScores(BaseModel):
-    current_score: int = 0
-    avg_score: int = 0
-    history_scores: int = 0
+class Score(BaseModel):
+    current_week: int
+    history: List[float]
 
 class User(BaseModel):
     id: str
@@ -19,7 +18,7 @@ class User(BaseModel):
     first_name: str
     surname: str
     disabled: bool
-    scores: List[UserScores]
+    scores: List[Score]
 
     @staticmethod
     def username_valid(username: str):
@@ -52,10 +51,15 @@ class UserOut(BaseModel):
     email: str | None = None
     first_name: str
     surname: str | None = None
-    current_score: int #TODO: should this be UserScores.current_score?
+    score: int #TODO: should this be UserScores.current_score?
 
 
 # ! CHORES
+
+class Room(BaseModel):
+    name: str
+    colour: str
+    icon: str
 
 
 class Chore(BaseModel):
@@ -67,9 +71,7 @@ class Chore(BaseModel):
     score: int
     description: str
     public: bool
-    room: str
-    color: str
-    icon: str
+    room: List[Room]
 
 
 class ChoreIn(BaseModel):
@@ -78,6 +80,7 @@ class ChoreIn(BaseModel):
     difficulty: int
     description: str
     public: bool
+    room: List[Room]
 
 # ! LEADERBOARD
 #class Leaderboard(BaseModel):
@@ -91,6 +94,7 @@ class TimetabledChore(BaseModel):
     chore_id: str
     user_id: str
     complete: bool = False
+    score: float
 
 
 # a timetable for a house for a given week
