@@ -122,9 +122,6 @@ async def create_invite_link(
     house_name: str,
     user: types.User = Depends(userAuth.get_current_active_user),
 ):
-    if username != user.username:
-        raise HTTPException(403)
-
     return await home.create_invite_link(username, house_name, user)
 
 

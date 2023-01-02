@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from routes import chores, homes
 from routes.username import root as username
 from lib.db import types, db, user
@@ -24,7 +24,7 @@ router.include_router(homes.router)
         401: {"description": "Incorrect username or password", "model": err.HTTPError},
     },
 )
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
     if not types.User.username_valid(form_data.username):
         raise HTTPException(
             400,
@@ -43,6 +43,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     access_token = tokens.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_Expires
     )
+    
+    response.set_cookie(key="access_token", value=access_token)
     return {"access_token": access_token, "token_type": "bearer", "user": types.UserOut(**user.__dict__)}
 
 
@@ -59,7 +61,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         }
     },
 )
-async def register(userInfo: types.UserIn):
+async def register(userInfo: types.UserIn, response: Response):
     # ? check format for username, password, email
     if not all(
         [types.User.username_valid(userInfo.username), types.User.email_valid(userInfo.email)]
@@ -76,4 +78,15 @@ async def register(userInfo: types.UserIn):
     access_token = tokens.create_access_token(
         data={"sub": userInfo.username}, expires_delta=access_token_Expires
     )
+    
+    response.set_cookie(key="access_token", value=access_token)
     return {"access_token": access_token, "token_type": "bearer", "user": new_user}
+
+@router.get(
+  "/me",
+  response_model=types.UserOut,
+  status_code=200,
+  tags=["user"]
+)
+async def get_user_info(user: types.User = Depends(get_current_active_user)):
+  return await types.UserOut(**user.__dict__)

@@ -4,6 +4,24 @@ from datetime import datetime, timedelta
 from starlette.responses import RedirectResponse
 from typing import List
 
+async def _generate_timetable(home_creator: str, home_name: str, caller: types.User, home: types.Home, chore_objs: List[types.Chore]) -> types.Timetable:
+    sorted_chores = sorted(chore_objs, key=lambda c: c.expected_time, reverse=True)
+    residents = list(map(lambda u: [u, 0], home.residents))
+    timetable = types.Timetable(
+      id="0",
+      home_id=home.id, 
+      tasks=[], 
+      start=datetime.now().isoformat(),
+      end=(datetime.now()+timedelta(days=7)).isoformat()
+    )
+    
+    for c in sorted_chores:
+      residents = sorted(residents, key=lambda u: u[1]) # TODO sort by chore score
+      timetable.tasks.append(types.TimetabledChore(chore_id=c.id, user_id=residents[0][0]))
+      residents[0][1] += c.expected_time
+      
+    return timetable
+
 async def get_or_generate_timetable(home_creator: str, home_name: str, caller: types.User) -> types.TimetableOut:
     home = await homeDB.get_home_by_creator_and_name(home_creator, home_name, caller)
     existing_timetable = await get_homes_timetable(home.id)
@@ -15,20 +33,7 @@ async def get_or_generate_timetable(home_creator: str, home_name: str, caller: t
     chore_objs = await chores.get_chores_by_id_from_list(home.chores)
     
     # ? generate new timetable
-    sorted_chores = sorted(chore_objs, key=lambda c: c.expected_time, reverse=True)
-    residents = list(map(lambda u: [u, 0], home.residents))
-    timetable = types.Timetable(
-      id="0",
-      home_id=home.id, 
-      tasks=[], 
-      start=datetime.now().isoformat(),
-      end=(datetime.now()+timedelta(days=7)).isoformat()
-    )
-      
-    for c in sorted_chores:
-      residents = sorted(residents, key=lambda u: u[1]) # TODO sort by chore score
-      timetable.tasks.append(types.TimetabledChore(chore_id=c.id, user_id=residents[0][0]))
-      residents[0][1] += c.expected_time
+    timetable = await _generate_timetable(home_creator, home_name, caller, home, chore_objs)
     
     # ? write timetable to database
     async with db.get_client() as client:
@@ -48,13 +53,18 @@ async def timetable_to_timetableOut(timetable: types.Timetable, chore_objs: List
   
   if chore_objs is None:
     chore_objs = await chores.get_chores_by_id_from_list(list(map(lambda t: t.chore_id, timetable.tasks)))
+    
+  tasks = []
+  for task in timetable.tasks:
+    chore_ls = list(filter(lambda c: c.id == task.chore_id, chore_objs))
+    if len(chore_ls) != 0:
+      tasks.append(types.TimetabledChoreOut(chore=chore_ls[0], assigned_to=task.user_id, complete=task.complete))
+                    
       
   return types.TimetableOut(
     start=timetable.start,
     end=timetable.end,
-    tasks=list(map(
-      lambda task: types.TimetabledChoreOut(chore=task[0], assigned_to=task[1].user_id, complete=task[1].complete ), 
-      zip(chore_objs, timetable.tasks)))
+    tasks=tasks
   )
       
 async def get_homes_timetable(home_id: str) -> types.Timetable | None:

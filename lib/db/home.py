@@ -32,7 +32,7 @@ async def get_home_by_creator_and_name(
       raise HTTPException(404, detail=f"Home {creator}/{house_name} not found")
     
     home = types.Home(**home_query_res[0])
-    if (caller.username != home.creator or caller.username not in home.residents) and not allow_all_users:
+    if (caller.username != home.creator and caller.username not in home.residents) and not allow_all_users:
       raise HTTPException(403, detail="You do not have permission to view this home")
     
     if not fetch_chores_and_residents:
@@ -54,7 +54,7 @@ async def get_home_residents(creator: str, home_name: str, caller: types.User):
 
 
 async def create_home(home: types.HomeIn, user: types.User):
-    user_homes = await get_users_homes(user)
+    user_homes = list(filter(lambda h: h.creator == user.username, await get_users_homes(user)))
     if len(user_homes) == MAX_HOMES:
       raise HTTPException(400, detail="Max number of homes already created")
     
@@ -114,10 +114,7 @@ async def delete_home(creator: str, home_name: str, caller: types.User):
 
 async def create_invite_link(
     creator: str, house_name: str, caller: types.User, link_alive_time_hours: int = 24
-) -> types.HomeInvite:
-    if caller.username != creator:
-      raise HTTPException(403, detail="You do not have permission to create an invite link for this home")
-    
+) -> types.HomeInvite:   
     home = await get_home_by_creator_and_name(creator, house_name, caller)
     if home.invite_link is not None and datetime.now().isoformat() < home.invite_link.expiry:
       return home.invite_link
