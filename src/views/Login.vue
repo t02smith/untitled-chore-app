@@ -9,12 +9,18 @@ const router = useRouter();
 const username = ref("");
 const password = ref("");
 
-async function login() {
-  if (username.value.length > 0 && password.value.length > 0) {
-    const res = await user.login(username.value, password.value);
+const submitted = ref(false);
 
-    if (res) router.back();
-  }
+async function login() {
+  submitted.value = true;
+  if (username.value.length > 0 && password.value.length > 0) {
+    if (await user.login(username.value, password.value)) {
+      user.error = "";
+      router.push("/home/dashboard");
+    }
+  } else user.error = "Not enough characters entered";
+
+  submitted.value = false;
 }
 </script>
 
@@ -38,7 +44,10 @@ async function login() {
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Log in</button>
+    <button type="submit" class="btn btn-primary" :disabled="submitted" v-if="!submitted">Log in</button>
+    <div class="spinner-border text-primary" role="status" v-else>
+      <span class="sr-only">Loading...</span>
+    </div>
   </form>
 
   <div v-else>You are already logged in</div>

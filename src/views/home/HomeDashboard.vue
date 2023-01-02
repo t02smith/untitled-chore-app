@@ -27,7 +27,7 @@
         </ul>
       </div>
 
-      <div style="margin-left: auto" class="d-flex align-items-center gap-4">
+      <div style="margin-left: auto" class="d-flex align-items-center gap-3">
         <button
           v-if="chosenHome"
           type="button"
@@ -39,9 +39,17 @@
 
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#join-home">Join</button>
 
-        <a :href="`/home/settings?home=`">
-          <font-awesome-icon icon="fa-solid fa-gear" style="font-size: 2rem" />
-        </a>
+        <button
+          class="bg-transparent"
+          :class="refreshing && 'spinner'"
+          style="border: none"
+          @click="refresh"
+          :disabled="refreshing">
+          <font-awesome-icon
+            icon="fa-solid fa-refresh"
+            style="font-size: 2rem"
+            :class="refreshing ? 'text-success' : 'text-muted'" />
+        </button>
       </div>
     </div>
 
@@ -74,18 +82,16 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import HouseMembers from "../../components/House/HouseMembers.vue";
 import HouseChoreList from "../../components/House/HouseChoreList.vue";
 import JoinHouse from "../../components/House/JoinHouse.vue";
 import { useHomeStore } from "../../stores/home";
 import { useUserStore } from "../../stores/user";
 import HouseInvite from "../../components/House/HouseInvite.vue";
-import { useRouter } from "vue-router";
 
 const home = useHomeStore();
 const user = useUserStore();
-const router = useRouter();
 
 const userHomes = ref([]);
 
@@ -93,10 +99,17 @@ const chosenHome = ref(null);
 const homeResidents = ref(null);
 const homeTimetable = ref(null);
 
-onMounted(async () => {
+const refreshing = computed(() => !(userHomes.value && homeResidents.value && homeTimetable.value));
+
+async function refresh() {
   if (user.accessToken === null) return;
+  userHomes.value = null;
+  homeResidents.value = null;
+  homeTimetable.value = null;
   userHomes.value = await home.getHomes();
-});
+}
+
+onMounted(() => refresh());
 
 watch(userHomes, () => {
   if (userHomes.value === null || userHomes.value.length === 0) return;
@@ -104,13 +117,26 @@ watch(userHomes, () => {
 });
 
 watch(chosenHome, async () => {
-  homeResidents.value = null;
-  homeTimetable.value = null;
-
   if (chosenHome.value === null) return;
 
   home.getHomeResidents(chosenHome.value.creator, chosenHome.value.name).then((data) => (homeResidents.value = data));
-
   home.getTimetable(chosenHome.value.creator, chosenHome.value.name).then((data) => (homeTimetable.value = data));
 });
 </script>
+<style scoped>
+.spinner {
+  animation-name: spin;
+  animation-duration: 1500ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>

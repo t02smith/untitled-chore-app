@@ -14,7 +14,6 @@ export const useUserStore = defineStore("users", () => {
 
   onMounted(() => {
     const token = cookies.get("access_token");
-    console.log(token);
     if (token === null) return;
 
     accessToken.value = token;

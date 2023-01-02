@@ -6,7 +6,12 @@
 
     <form @submit.prevent="join">
       <div class="modal-body">
+        <div class="alert alert-success" v-if="success">
+          <h6 class="alert-heading">✅ Home joined successfully</h6>
+        </div>
+
         <Error />
+
         <div class="container d-flex flex-column gap-3">
           <div class="form-group">
             <label for="" class="text-white">🧑‍🦱Home Owner:</label>
@@ -39,7 +44,7 @@
               name=""
               id=""
               class="form-control"
-              placeholder="who created the house"
+              placeholder="The secret invite code to the house"
               aria-describedby="helpId"
               v-model="joinId" />
           </div>
@@ -47,8 +52,12 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-success" type="submit"><strong> Join </strong></button>
-        <button type="button" class="btn btn-danger" data-dismiss="modal"><strong> Close </strong></button>
+        <button class="btn btn-success" type="submit" :disabled="submitted" v-if="!submitted">
+          <strong> Join </strong>
+        </button>
+        <div v-else class="spinner-border text-success" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
       </div>
     </form>
   </div>
@@ -64,7 +73,20 @@ const joinId = ref("");
 
 const home = useHomeStore();
 
+const success = ref(false);
+const submitted = ref(false);
+
 async function join() {
-  await home.joinHome(creator.value, name.value, joinId.value);
+  submitted.value = true;
+  success.value = false;
+  const res = await home.joinHome(creator.value, name.value, joinId.value);
+
+  joinId.value = "";
+  if (res) {
+    creator.value = "";
+    name.value = "";
+    success.value = true;
+  }
+  submitted.value = false;
 }
 </script>

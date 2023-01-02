@@ -3,11 +3,19 @@ div
   <div>
     <div class="d-flex align-items-center">
       <h3 class="text-primary">Still to do:</h3>
-      <h3 style="margin-left: auto" class="text-muted">3 days left</h3>
+      <h3 style="margin-left: auto" class="text-muted">{{ daysLeft }} days left</h3>
     </div>
 
     <div class="d-flex flex-column gap-1" v-if="props.timetable && user.user">
       <ChoreCard
+        v-if="props.timetable.tasks.filter((t) => !t.complete).length === 0"
+        name="No chores left to do"
+        color="green"
+        icon="fa-solid fa-square-check"
+        room="good job!" />
+
+      <ChoreCard
+        v-else
         v-for="c in props.timetable.tasks
           .filter((t) => !t.complete)
           .sort((a, b) => (a.assigned_to < b.assigned_to ? -1 : 1))"
@@ -24,13 +32,11 @@ div
   </div>
 </template>
 <script setup>
-import { onMounted } from "vue";
-import { useHomeStore } from "../../stores/home";
+import { onMounted, computed } from "vue";
 import { useUserStore } from "../../stores/user";
 import ChoreCard from "../ChoreCard.vue";
 
 const user = useUserStore();
-const home = useHomeStore();
 
 onMounted(() => {
   if (!user.user) user.getUserData();
@@ -41,4 +47,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const daysLeft = computed(() =>
+  props.timetable ? Math.ceil((new Date(props.timetable.end).getTime() - new Date().getTime()) / (1000 * 3600 * 24)) : 0
+);
 </script>
