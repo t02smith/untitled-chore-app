@@ -3,30 +3,11 @@ from typing import List, Dict
 from datetime import datetime
 import re
 from dataclasses import dataclass
+from statistics import mean
 
 # ! USER
 
-
-class User(BaseModel):
-    id: str
-    username: str
-    password: str
-    email: str
-    first_name: str
-    surname: str
-    disabled: bool
-
-    @staticmethod
-    def username_valid(username: str):
-        return re.search("[\\d\\w\\-_]{7,15}", username) is not None
-
-    @staticmethod
-    def email_valid(email: str):
-        return re.search("^[\\w\\-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", email)
-
-
 # ? User IO
-
 
 class UserIn(BaseModel):
     username: str
@@ -47,9 +28,44 @@ class UserOut(BaseModel):
     email: str | None = None
     first_name: str
     surname: str | None = None
+    score: float
+    
+# ? User DB
+
+class Score(BaseModel):
+    current_week: float
+    history: List[float]
+
+class User(BaseModel):
+    id: str
+    username: str
+    password: str
+    email: str
+    first_name: str
+    surname: str
+    disabled: bool
+    scores: Score
+
+    @staticmethod
+    def username_valid(username: str):
+        return re.search("[\\d\\w\\-_]{7,15}", username) is not None
+
+    @staticmethod
+    def email_valid(email: str):
+        return re.search("^[\\w\\-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", email)
+
+    def to_UserOut(self) -> UserOut:
+      return UserOut(**self.__dict__, score=mean(self.scores.history + [self.scores.current_week]))
+
+
 
 
 # ! CHORES
+
+class Room(BaseModel):
+    name: str
+    colour: str
+    icon: str
 
 
 class Chore(BaseModel):
@@ -57,15 +73,24 @@ class Chore(BaseModel):
     author: str
     name: str
     expected_time: int
+    difficulty: int
+    score: int
     description: str
     public: bool
+    room: List[Room]
 
 
 class ChoreIn(BaseModel):
     name: str
     expected_time: int
+    difficulty: int
     description: str
     public: bool
+    room: List[Room]
+
+# ! LEADERBOARD
+#class Leaderboard(BaseModel):
+    
 
 
 # ! TIMETABLE
@@ -75,12 +100,13 @@ class TimetabledChore(BaseModel):
     chore_id: str
     user_id: str
     complete: bool = False
-    
+    score: float
     
 class TimetabledChoreOut(BaseModel):
     chore: Chore
     assigned_to: str
     complete: bool
+    score: float
 
 # a timetable for a house for a given week
 class Timetable(BaseModel):

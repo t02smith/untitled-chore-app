@@ -78,7 +78,7 @@ async def complete_task(username: str, house_name: str, chore_id: str, user: typ
   response_model=List[types.UserOut]
 )
 async def get_home_residents(username: str, house_name: str, user: types.User = Depends(userAuth.get_current_active_user)):
-  return await home.get_home_residents(username, house_name, user)
+  return list(map(lambda u: u.to_UserOut(), await home.get_home_residents(username, house_name, user)))
 
 # ! CHORES
 

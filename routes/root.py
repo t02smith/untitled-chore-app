@@ -45,12 +45,11 @@ async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depen
     )
     
     response.set_cookie(key="access_token", value=access_token)
-    return {"access_token": access_token, "token_type": "bearer", "user": types.UserOut(**user.__dict__)}
+    return {"access_token": access_token, "token_type": "bearer", "user": user.to_UserOut()}
 
 
 @router.post(
     "/register",
-    response_model=tokens.Token,
     description="Register a new user to untitled-chore-api",
     tags=["user", "auth"],
     status_code=201,
@@ -72,6 +71,7 @@ async def register(userInfo: types.UserIn, response: Response):
 
     # ? create new user
     new_user = await user.register_user(userInfo)
+    print(new_user)
 
     # * check access token
     access_token_Expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -89,4 +89,4 @@ async def register(userInfo: types.UserIn, response: Response):
   tags=["user"]
 )
 async def get_user_info(user: types.User = Depends(get_current_active_user)):
-  return await types.UserOut(**user.__dict__)
+  return await user.to_UserOut()

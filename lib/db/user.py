@@ -44,9 +44,13 @@ async def register_user(user: types.UserIn):
                     "surname": user.surname,
                     "email": user.email,
                     "disabled": False,
+                    "scores": {
+                      "current_week": 0,
+                      "history": []  
+                    },
                 },
                 enable_automatic_id_generation=True,
-            )
+            ), score=0
         )
 
 
@@ -69,6 +73,9 @@ async def update_user(old, updated: types.UserUpdate) -> types.UserOut:
                     if updated.surname is None
                     else updated.surname,
                     "disabled": old.disabled,
+                    "scores": old.scores
+                    if updated.scores is None #TODO: fix per item in list?
+                    else updated.scores,
                 }
             )
         )
