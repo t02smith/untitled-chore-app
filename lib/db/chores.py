@@ -15,7 +15,7 @@ async def create_chore(chore: types.ChoreIn, user: types.User) -> types.Chore:
                 "description": chore.description,
                 "public": chore.public,
                 "author": user.username,
-                "room": chore.room.__dict__
+                "room": chore.room.__dict__,
             },
             enable_automatic_id_generation=True,
         )
@@ -37,24 +37,27 @@ async def get_chores_from_user(username: str, include_private: bool = False):
 
         return [types.Chore(**c) async for c in chores_res]
 
-      
+
 async def get_chore_by_id(id: str) -> types.Chore | None:
     res = await get_chores_by_id_from_list([id])
     return None if len(res) == 0 else res[0]
-      
-      
+
+
 async def get_chores_by_id_from_list(chores: List[str]) -> List[types.Chore]:
-  async with db.get_client() as client:
-    container = await db.get_or_create_container(client, "chores")
-    return [types.Chore(**c) async for c in container.query_items(
-      """
+    async with db.get_client() as client:
+        container = await db.get_or_create_container(client, "chores")
+        return [
+            types.Chore(**c)
+            async for c in container.query_items(
+                """
       SELECT *
       FROM chores c
       WHERE ARRAY_CONTAINS(@chores, c.id) 
-      """, parameters=[{"name": "@chores", "value": chores}]
-    )]
-    
-  
+      """,
+                parameters=[{"name": "@chores", "value": chores}],
+            )
+        ]
+
 
 async def update_chore(id: str, chore: types.ChoreIn, username: str):
     async with db.get_client() as client:
@@ -81,12 +84,17 @@ async def update_chore(id: str, chore: types.ChoreIn, username: str):
 
         return types.Chore(**res)
 
+
 async def default_chores():
-  async with db.get_client() as client:
-    container = await db.get_or_create_container(client, "chores")
-    return [c async for c in container.query_items(
-      """
+    async with db.get_client() as client:
+        container = await db.get_or_create_container(client, "chores")
+        return [
+            c
+            async for c in container.query_items(
+                """
         SELECT TOP 6 *
         FROM chores c
         WHERE c.id LIKE 'default-%'
-      """ )]
+      """
+            )
+        ]

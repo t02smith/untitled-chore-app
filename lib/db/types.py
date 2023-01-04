@@ -53,6 +53,12 @@ class User(BaseModel):
     @staticmethod
     def email_valid(email: str):
         return re.search("^[\\w\\-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", email)
+      
+    def to_json(self):
+      dic = self.__dict__
+      dic["scores"] = self.scores.__dict__
+
+      return dic
 
     def to_UserOut(self) -> UserOut:
       return UserOut(**self.__dict__, score=mean(self.scores.history + [self.scores.current_week]))

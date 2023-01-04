@@ -27,8 +27,12 @@ async def get_or_generate_timetable(home_creator: str, home_name: str, caller: t
     existing_timetable = await get_homes_timetable(home.id)
     
     # ? timetable exists and is still in date
-    if existing_timetable is not None and existing_timetable.end > datetime.now().isoformat():
-      return await timetable_to_timetableOut(existing_timetable)
+    if existing_timetable is not None:
+      if existing_timetable.end > datetime.now().isoformat():
+        return await timetable_to_timetableOut(existing_timetable)
+      else:
+        for resident in home.residents:
+          await userDB.new_user_score(resident)
     
     chore_objs = await chores.get_chores_by_id_from_list(home.chores)
     
@@ -129,8 +133,11 @@ async def complete_task(username: str, house_name: str, chore_id: str, user: typ
       raise HTTPException(400, detail="This chore is already complete")
     
     chore.complete = True
-    #await userDB.update_user(user, )
-    #TODO: implement increase user score based on chore score
+    user.scores.current_week += chore.score
+    
+    user_container = await db.get_or_create_container(client, "users")
+    await user_container.upsert_item(user.to_json())
+    
 
     await container.upsert_item({
       "id": timetable.id,

@@ -4,20 +4,27 @@ from lib.db import types
 from lib.auth.auth import pwd_context
 from typing import List
 
+
 async def get_user_by_username(username: str) -> types.User | None:
     res = await get_users_by_username_from_list([username])
     return None if len(res) == 0 else res[0]
 
+
 async def get_users_by_username_from_list(usernames: List[str]) -> List[types.User]:
-  async with get_client() as client:
-    container = await get_or_create_container(client, "users")
-    return [types.User(**u) async for u in container.query_items(
-      """
+    async with get_client() as client:
+        container = await get_or_create_container(client, "users")
+        return [
+            types.User(**u)
+            async for u in container.query_items(
+                """
       SELECT *
       FROM users u
       WHERE ARRAY_CONTAINS(@usernames, u.username)
-      """, parameters=[{"name": "@usernames", "value": usernames}]
-    )]
+      """,
+                parameters=[{"name": "@usernames", "value": usernames}],
+            )
+        ]
+
 
 async def register_user(user: types.UserIn):
     async with get_client() as client:
@@ -44,13 +51,11 @@ async def register_user(user: types.UserIn):
                     "surname": user.surname,
                     "email": user.email,
                     "disabled": False,
-                    "scores": {
-                      "current_week": 0,
-                      "history": []  
-                    },
+                    "scores": {"current_week": 0, "history": []},
                 },
                 enable_automatic_id_generation=True,
-            ), score=0
+            ),
+            score=0
         )
 
 
@@ -74,8 +79,16 @@ async def update_user(old, updated: types.UserUpdate) -> types.UserOut:
                     else updated.surname,
                     "disabled": old.disabled,
                     "scores": old.scores
-                    if updated.scores is None #TODO: fix per item in list?
+                    if updated.scores is None  # TODO: fix per item in list?
                     else updated.scores,
                 }
             )
         )
+
+async def new_user_score(user: types.User):
+  user.scores.history.append(user.scores.current_week)
+  user.scores.current_week = 0
+  
+  async with get_client() as client:
+    container = get_or_create_container(client, "users")
+    await container.upsert_item(user.to_json())
