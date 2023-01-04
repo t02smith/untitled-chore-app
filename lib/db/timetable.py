@@ -17,7 +17,7 @@ async def _generate_timetable(home_creator: str, home_name: str, caller: types.U
     
     for c in sorted_chores:
       residents = sorted(residents, key=lambda u: u[1]) # TODO sort by chore score
-      timetable.tasks.append(types.TimetabledChore(chore_id=c.id, user_id=residents[0][0]))
+      timetable.tasks.append(types.TimetabledChore(chore_id=c.id, user_id=residents[0][0], score=c.score))
       residents[0][1] += c.expected_time
       
     return timetable
@@ -58,7 +58,7 @@ async def timetable_to_timetableOut(timetable: types.Timetable, chore_objs: List
   for task in timetable.tasks:
     chore_ls = list(filter(lambda c: c.id == task.chore_id, chore_objs))
     if len(chore_ls) != 0:
-      tasks.append(types.TimetabledChoreOut(chore=chore_ls[0], assigned_to=task.user_id, complete=task.complete))
+      tasks.append(types.TimetabledChoreOut(chore=chore_ls[0], assigned_to=task.user_id, complete=task.complete, score=chore_ls[0].score))
                     
       
   return types.TimetableOut(

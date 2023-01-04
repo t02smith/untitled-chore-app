@@ -15,7 +15,7 @@ async def create_chore(chore: types.ChoreIn, user: types.User) -> types.Chore:
                 "description": chore.description,
                 "public": chore.public,
                 "author": user.username,
-                "room": chore.room
+                "room": chore.room.__dict__
             },
             enable_automatic_id_generation=True,
         )

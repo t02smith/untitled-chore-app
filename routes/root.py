@@ -89,4 +89,4 @@ async def register(userInfo: types.UserIn, response: Response):
   tags=["user"]
 )
 async def get_user_info(user: types.User = Depends(get_current_active_user)):
-  return await user.to_UserOut()
+  return user.to_UserOut()

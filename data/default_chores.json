@@ -2,67 +2,91 @@
   {
     "id": "default-0",
     "name": "Clean the Shower",
-    "room": "Bathroom",
-    "color": "#0ac",
-    "icon": "fa fa-shower",
     "author": "uca",
     "expected_time": 30,
+    "difficulty": 2,
+    "score": 60,
     "description": "Clean the shower, unclog the plug, remove any limescale, ...",
-    "public": true
+    "public": true,
+    "room": {
+      "name": "Bathroom",
+      "colour": "#0ac",
+      "icon": "fa fa-shower"
+    }
   },
   {
     "id": "default-1",
     "name": "Do the Dishes",
-    "room": "Kitchen",
-    "color": "#F24E1E",
-    "icon": "fa-solid fa-kitchen-set",
     "author": "uca",
     "expected_time": 15,
+    "difficulty": 1,
+    "score": 15,
     "description": "Do the dirty dishes left in the kitchen",
-    "public": true
+    "public": true,
+    "room": {
+      "name": "Kitchen",
+      "colour": "#F24E1",
+      "icon": "fa-solid fa-kitchen-set"
+    }
   },
   {
     "id": "default-2",
     "name": "Hoover",
-    "room": "Living Room",
-    "color": "#0FA958",
-    "icon": "fa-solid fa-couch",
     "author": "uca",
     "expected_time": 5,
+    "difficulty": 2,
+    "score": 10,
     "description": "Hoover and or sweep the floor.",
-    "public": true
+    "public": true,
+    "room": {
+      "name": "Living Room",
+      "colour": "#0FA958",
+      "icon": "fa-solid fa-couch"
+    }
   },
   {
     "id": "default-3",
     "name": "Take the Bins Out",
-    "room": "Kitchen",
-    "color": "#F24E1E",
-    "icon": "fa-solid fa-kitchen-set",
     "author": "uca",
     "expected_time": 5,
+    "difficulty": 1,
+    "score": 5,
     "description": "Take the general waste, food and recycling bins out",
-    "public": true
+    "public": true,
+    "room": {
+      "name": "Kitchen",
+      "colour": "#F24E1",
+      "icon": "fa-solid fa-kitchen-set"
+    }
   },
   {
     "id": "default-4",
     "name": "Tidy Up",
-    "room": "Living Room",
-    "color": "#0FA958",
-    "icon": "fa-solid fa-couch",
     "author": "uca",
     "expected_time": 20,
+    "difficulty": 2,
+    "score": 40,
     "description": "Tidy up all the mess in the living room",
-    "public": true
+    "public": true,
+    "room": {
+      "name": "Living Room",
+      "colour": "#0FA958",
+      "icon": "fa-solid fa-couch"
+    }
   },
   {
     "id": "default-5",
     "name": "Clean the Toilet",
-    "room": "Bathroom",
-    "color": "#0ac",
-    "icon": "fa fa-shower",
     "author": "uca",
     "expected_time": 20,
+    "difficulty": 3,
+    "score": 60,
     "description": "Clean and bleach the toilet, including any skidmarks!",
-    "public": true
+    "public": true,
+    "room": {
+      "name": "Bathroom",
+      "colour": "#0ac",
+      "icon": "fa fa-shower"
+    }
   }
 ]

@@ -74,11 +74,11 @@ class Chore(BaseModel):
     name: str
     expected_time: int
     difficulty: int
-    score: int
+    score: float
     description: str
     public: bool
-    room: List[Room]
-
+    room: Room
+    
 
 class ChoreIn(BaseModel):
     name: str
@@ -86,7 +86,7 @@ class ChoreIn(BaseModel):
     difficulty: int
     description: str
     public: bool
-    room: List[Room]
+    room: Room
 
 # ! LEADERBOARD
 #class Leaderboard(BaseModel):
