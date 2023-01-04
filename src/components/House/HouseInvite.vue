@@ -19,6 +19,10 @@
           >
         </p>
       </div>
+
+      <router-link class="btn btn-success" :to="`/home/dashboard?home=${props.creator}/${props.homeName}`"
+        >Dashboard</router-link
+      >
     </div>
   </div>
 </template>
@@ -39,6 +43,10 @@ const props = defineProps({
   title: {
     type: String,
     default: "Your Home's Invite Info",
+  },
+  showLink: {
+    type: Boolean,
+    default: false,
   },
 });
 

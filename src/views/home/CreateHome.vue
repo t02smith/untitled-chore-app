@@ -44,9 +44,9 @@
             v-for="c in defaultChores"
             :name="c.name"
             :expectedTime="c.expected_time"
-            room="bathroom"
-            color="#0ac"
-            icon="fa fa-shower"
+            :room="c.room.name"
+            :color="c.room.colour"
+            :icon="c.room.icon"
             :onToggle="() => toggleChore(c.id)"
             :noToggle="false"
             style="width: 20rem" />
@@ -61,11 +61,21 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-success btn-lg" style="width: fit-content">Create</button>
+      <button
+        v-if="!submitted"
+        :disabled="submitted"
+        type="submit"
+        class="btn btn-success btn-lg"
+        style="width: fit-content">
+        Create
+      </button>
+      <div class="spinner-border text-primary" role="status" v-else>
+        <span class="sr-only">Loading...</span>
+      </div>
     </form>
   </div>
 
-  <HouseInvite v-else :creator="homeCreated.creator" :homeName="homeCreated.name" title="Home Created!" />
+  <HouseInvite v-else :creator="homeCreated.creator" :homeName="homeCreated.name" title="Home Created!" showLink />
 </template>
 <script setup>
 import { ref, onMounted } from "vue";
@@ -88,13 +98,17 @@ const chosenChores = ref([]);
 const inviteLink = ref(null);
 const homeCreated = ref(null);
 
+const submitted = ref(false);
+
 const toggleChore = (id) =>
   chosenChores.value.includes(id)
     ? (chosenChores.value = chosenChores.value.filter((c) => c !== id))
     : chosenChores.value.push(id);
 
 async function createHome() {
+  submitted.value = true;
   const res = await home.createHome(houseName.value, chosenChores.value);
+  submitted.value = false;
   if (!res) return;
 
   homeCreated.value = res;

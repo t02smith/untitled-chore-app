@@ -38,6 +38,7 @@
         </button>
 
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#join-home">Join</button>
+        <router-link to="/home/create" class="btn btn-success">Create</router-link>
 
         <button
           class="bg-transparent"
@@ -89,6 +90,7 @@ import JoinHouse from "../../components/House/JoinHouse.vue";
 import { useHomeStore } from "../../stores/home";
 import { useUserStore } from "../../stores/user";
 import HouseInvite from "../../components/House/HouseInvite.vue";
+import { useRoute } from "vue-router";
 
 const home = useHomeStore();
 const user = useUserStore();
@@ -100,6 +102,8 @@ const homeResidents = ref(null);
 const homeTimetable = ref(null);
 
 const refreshing = computed(() => !(userHomes.value && homeResidents.value && homeTimetable.value));
+
+const route = useRoute();
 
 async function refresh() {
   if (user.accessToken === null) return;
@@ -113,7 +117,10 @@ onMounted(() => refresh());
 
 watch(userHomes, () => {
   if (userHomes.value === null || userHomes.value.length === 0) return;
-  chosenHome.value = userHomes.value[0];
+
+  const selected = userHomes.value.filter((h) => `${h.creator}/${h.name}` === route.query.home);
+
+  chosenHome.value = selected.length === 0 ? userHomes.value[0] : selected[0];
 });
 
 watch(chosenHome, async () => {

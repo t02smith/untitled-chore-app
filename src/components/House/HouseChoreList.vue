@@ -21,9 +21,9 @@ div
           .sort((a, b) => (a.assigned_to < b.assigned_to ? -1 : 1))"
         :name="c.chore.name"
         :username="c.assigned_to"
-        room="bathroom"
-        color="#0ac"
-        icon="fa fa-shower" />
+        :room="c.chore.room.name"
+        :color="c.chore.room.colour"
+        :icon="c.chore.room.icon" />
     </div>
 
     <div v-else class="p-1 bg-dark rounded">
