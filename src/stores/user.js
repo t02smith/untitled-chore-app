@@ -45,6 +45,11 @@ export const useUserStore = defineStore("users", () => {
     return true;
   }
 
+  function logout() {
+    cookies.remove("access_token");
+    accessToken.value = null;
+  }
+
   async function register(username, password, firstName, surname, email) {
     const res = await axios.post(
       `${import.meta.env.VITE_API_BASE}/register`,
@@ -64,5 +69,5 @@ export const useUserStore = defineStore("users", () => {
     return true;
   }
 
-  return { user, login, accessToken, register, error, getUserData };
+  return { user, login, logout, accessToken, register, error, getUserData };
 });

@@ -31,14 +31,16 @@
         <button
           v-if="chosenHome"
           type="button"
-          class="btn btn-secondary"
+          class="btn btn-warning"
           data-bs-toggle="modal"
           data-bs-target="#invite-link">
-          Invite
+          <strong>Invite</strong>
         </button>
 
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#join-home">Join</button>
-        <router-link to="/home/create" class="btn btn-success">Create</router-link>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#join-home">
+          <strong>Join</strong>
+        </button>
+        <router-link to="/home/create" class="btn btn-success"><strong>Create</strong></router-link>
 
         <button
           class="bg-transparent"
@@ -49,6 +51,7 @@
           <font-awesome-icon
             icon="fa-solid fa-refresh"
             style="font-size: 2rem"
+            class="hover"
             :class="refreshing ? 'text-success' : 'text-muted'" />
         </button>
       </div>
@@ -59,7 +62,7 @@
       <div class="row">
         <HouseMembers class="col-4" :residents="homeResidents" />
 
-        <HouseChoreList class="col-8" :timetable="homeTimetable" />
+        <HouseChoreList class="col-8" :timetable="homeTimetable" :completeChore="complete" />
       </div>
     </div>
 
@@ -107,10 +110,17 @@ const route = useRoute();
 
 async function refresh() {
   if (user.accessToken === null) return;
-  userHomes.value = null;
+  userHomes.value = [];
   homeResidents.value = null;
   homeTimetable.value = null;
   userHomes.value = await home.getHomes();
+}
+
+async function complete(id) {
+  const res = await home.completeChore(chosenHome.value.creator, chosenHome.value.name, id);
+  if (res) {
+    refresh();
+  }
 }
 
 onMounted(() => refresh());
@@ -145,5 +155,10 @@ watch(chosenHome, async () => {
   to {
     transform: rotate(360deg);
   }
+}
+
+.hover:hover {
+  opacity: 0.75;
+  transition: 150ms;
 }
 </style>

@@ -1,23 +1,21 @@
 <template>
   <div>
-    <h3 class="text-primary">Your house:</h3>
-    <ul class="list-group list-group-flush bg-dark">
-      <li
+    <h3 class="text-primary">🏠 Your house:</h3>
+    <div class="d-flex flex-column gap-2">
+      <div
         v-if="residents"
         v-for="user in residents"
-        class="list-group-item bg-dark text-light row d-flex align-items-center">
-        <div class="fw-bold col-6" style="font-size: 1.4rem">
+        class="px-3 py-1 bg-dark text-light d-flex align-items-center rounded">
+        <div class="fw-bold" style="font-size: 1.4rem">
           {{ user.username }}
         </div>
-        <p class="col-6 ms-auto" style="font-size: 1rem">
-          {{ "⭐".repeat(3) }}
-        </p>
-      </li>
+        <strong class="ms-auto text-warning" style="font-size: 1.2rem">{{ user.score }}⭐</strong>
+      </div>
 
-      <div v-else class="p-1 bg-dark rounded" style="border-collapse: separate">
+      <div v-else class="p-1 bg-dark rounded">
         <p class="p-2">loading residents...</p>
       </div>
-    </ul>
+    </div>
   </div>
 </template>
 <script setup>

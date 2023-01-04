@@ -47,9 +47,16 @@
             :room="c.room.name"
             :color="c.room.colour"
             :icon="c.room.icon"
-            :onToggle="() => toggleChore(c.id)"
-            :noToggle="false"
-            style="width: 20rem" />
+            :difficulty="c.difficulty"
+            style="width: 20rem">
+            <input
+              type="checkbox"
+              name=""
+              id=""
+              class="form-check-input ms-2 bg-secondary justify-self-end"
+              style="width: 2rem; height: 2rem"
+              @click="() => toggleChore(c.id)" />
+          </ChoreCard>
 
           <ChoreCard
             v-else
