@@ -6,7 +6,7 @@ div
       <h3 style="margin-left: auto" class="text-muted">🗓️ {{ daysLeft }} days left</h3>
     </div>
 
-    <div class="d-flex flex-column gap-1" v-if="props.timetable && user.user">
+    <div class="d-flex flex-column gap-2" v-if="props.timetable && user.user">
       <ChoreCard
         v-if="props.timetable.tasks.filter((t) => !t.complete).length === 0"
         name="No chores left to do"

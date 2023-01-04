@@ -44,11 +44,11 @@ const props = defineProps({
   },
   expectedTime: {
     type: Number,
-    default: 10,
+    default: null,
   },
   difficulty: {
     type: Number,
-    default: 1,
+    default: null,
   },
 });
 

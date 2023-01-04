@@ -28,22 +28,23 @@
       </div>
 
       <div style="margin-left: auto" class="d-flex align-items-center gap-3">
-        <button
-          v-if="chosenHome"
-          type="button"
-          class="btn btn-warning"
-          data-bs-toggle="modal"
-          data-bs-target="#invite-link">
-          <strong>Invite</strong>
-        </button>
-
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#join-home">
           <strong>Join</strong>
         </button>
         <router-link to="/home/create" class="btn btn-success"><strong>Create</strong></router-link>
 
         <button
+          type="button"
+          :disabled="!chosenHome"
           class="bg-transparent"
+          data-bs-toggle="modal"
+          data-bs-target="#invite-link"
+          style="font-size: 2rem; border: none">
+          <font-awesome-icon class="text-white hover" icon="fa-solid fa-user-plus" />
+        </button>
+
+        <button
+          class="bg-transparent mt-1"
           :class="refreshing && 'spinner'"
           style="border: none"
           @click="refresh"
@@ -58,7 +59,7 @@
     </div>
 
     <!-- Page content -->
-    <div class="container-fluid px-5">
+    <div class="container-fluid px-5 pb-4">
       <div class="row">
         <HouseMembers class="col-4" :residents="homeResidents" />
 

@@ -20,7 +20,10 @@
         </p>
       </div>
 
-      <router-link class="btn btn-success" :to="`/home/dashboard?home=${props.creator}/${props.homeName}`"
+      <router-link
+        v-if="props.showLink"
+        class="btn btn-success"
+        :to="`/home/dashboard?home=${props.creator}/${props.homeName}`"
         >Dashboard</router-link
       >
     </div>
