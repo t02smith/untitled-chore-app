@@ -48,7 +48,7 @@ class User(BaseModel):
 
     @staticmethod
     def username_valid(username: str):
-        return re.search("[\\d\\w\\-_]{7,15}", username) is not None
+        return re.search("[\\d\\w\\-_\.]{4,15}", username) is not None
 
     @staticmethod
     def email_valid(email: str):

@@ -54,7 +54,6 @@ async def get_or_generate_timetable(home_creator: str, home_name: str, caller: t
       }, enable_automatic_id_generation=True)), chore_objs=chore_objs)    
   
 async def timetable_to_timetableOut(timetable: types.Timetable, chore_objs: List[types.Chore] = None) -> types.TimetableOut:
-  
   if chore_objs is None:
     chore_objs = await chores.get_chores_by_id_from_list(list(map(lambda t: t.chore_id, timetable.tasks)))
     
@@ -113,7 +112,7 @@ async def get_users_timetable(user: types.User) -> types.UserTimetable:
   
 async def complete_task(username: str, house_name: str, chore_id: str, user: types.User):
   home = await homeDB.get_home_by_creator_and_name(username, house_name, user)
-  user = await userDB.get_user_by_username(username)
+  user = await userDB.get_user_by_username(user.username)
   
   async with db.get_client() as client:
     container = await db.get_or_create_container(client, "timetables")
