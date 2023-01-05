@@ -3,8 +3,14 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
-      <a class="navbar-brand">Untitled</a>
-      <img src="@/assets/logo.png" alt="Image can't be displayed" width="40" height="40" />
+      <router-link
+        to="/"
+        class="d-flex flex-row align-items-center justify-content-center"
+        style="text-decoration: none">
+        <img src="@/assets/logo.png" alt="Image can't be displayed" width="40" height="40" />
+
+        <h5 class="navbar-brand font-bebas">Untitled Chore App</h5>
+      </router-link>
 
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
@@ -39,5 +45,9 @@ div.navbar-nav :link {
 
 img {
   margin-right: 0.5em;
+}
+
+h5 {
+  margin: 0;
 }
 </style>

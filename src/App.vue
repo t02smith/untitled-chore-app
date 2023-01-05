@@ -18,9 +18,9 @@ const path = computed(() => route.path);
 
 <template>
   <div>
-    <NavBar />
+    <NavBar v-if="path !== '/'" />
 
-    <LoginPrompt v-if="!user.accessToken && path !== '/login' && path !== '/register'" />
+    <LoginPrompt v-if="!user.accessToken && !['/', '/login', '/register'].includes(path)" />
 
     <Error class="container my-3" />
 
@@ -30,5 +30,3 @@ const path = computed(() => route.path);
     </main>
   </div>
 </template>
-
-<style scoped></style>

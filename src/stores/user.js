@@ -60,7 +60,7 @@ export const useUserStore = defineStore("users", () => {
         surname: surname,
         email: email,
       },
-      { validateStatus: () => true, withCredentials: true }
+      { validateStatus: () => true }
     );
 
     if (res.status !== 201) return false;

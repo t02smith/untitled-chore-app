@@ -6,10 +6,16 @@ import Help from "../views/Help.vue";
 import User from "../views/User.vue";
 import HomeDashboard from "../views/home/HomeDashboard.vue";
 import CreateHome from "../views/home/CreateHome.vue";
+import Root from "../views/Root.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: "/",
+      name: "root",
+      component: Root,
+    },
     {
       path: "/login",
       name: "login",

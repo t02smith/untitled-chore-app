@@ -4,7 +4,7 @@
     <div class="py-4 px-5 d-flex align-items-center">
       <div class="dropdown">
         <button
-          class="btn btn-success dropdown-toggle d-flex align-items-center gap-2"
+          class="btn btn-dark dropdown-toggle d-flex align-items-center gap-2"
           style="font-size: 1.5rem"
           type="button"
           id="dropdownMenuButton1"
@@ -28,21 +28,6 @@
       </div>
 
       <div style="margin-left: auto" class="d-flex align-items-center gap-3">
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#join-home">
-          <strong>Join</strong>
-        </button>
-        <router-link to="/home/create" class="btn btn-success"><strong>Create</strong></router-link>
-
-        <button
-          type="button"
-          :disabled="!chosenHome"
-          class="bg-transparent"
-          data-bs-toggle="modal"
-          data-bs-target="#invite-link"
-          style="font-size: 2rem; border: none">
-          <font-awesome-icon class="text-white hover" icon="fa-solid fa-user-plus" />
-        </button>
-
         <button
           class="bg-transparent mt-1"
           :class="refreshing && 'spinner'"
@@ -55,6 +40,29 @@
             class="hover"
             :class="refreshing ? 'text-success' : 'text-muted'" />
         </button>
+
+        <div class="dropdown">
+          <button
+            class="bg-transparent text-white d-flex align-items-center gap-2"
+            style="font-size: 1.5rem; border: none; font-size: 2rem"
+            type="button"
+            id="dropdownMenuButton1"
+            data-bs-toggle="dropdown"
+            aria-expanded="false">
+            <font-awesome-icon icon="fa-solid fa-bars" />
+          </button>
+          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton1">
+            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#invite-link" :disabled="!chosenHome">
+              🫂 Invite others
+            </button>
+            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#join-home">🏡 Join home</button>
+            <router-link to="/home/create" class="dropdown-item">🆕 Create home</router-link>
+            <hr v-if="chosenHome && chosenHome.creator === user.user.username" />
+            <button v-if="chosenHome && chosenHome.creator === user.user.username" class="dropdown-item">
+              ⚙️ Settings
+            </button>
+          </ul>
+        </div>
       </div>
     </div>
 
@@ -80,7 +88,7 @@
     </div>
 
     <div class="modal fade" id="join-home" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" style="width: fit-content; min-width: 60%">
+      <div class="modal-dialog modal-dialog-centered" style="width: 500px">
         <JoinHouse />
       </div>
     </div>
