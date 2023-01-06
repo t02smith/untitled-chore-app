@@ -7,7 +7,7 @@
         to="/"
         class="d-flex flex-row align-items-center justify-content-center"
         style="text-decoration: none">
-        <img src="@/assets/logo.png" alt="Image can't be displayed" width="40" height="40" />
+        <img src="@/assets/logo.svg" alt="Image can't be displayed" width="40" height="40" />
 
         <h5 class="navbar-brand font-bebas">Untitled Chore App</h5>
       </router-link>

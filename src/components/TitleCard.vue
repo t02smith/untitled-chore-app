@@ -6,7 +6,7 @@
       App
     </h1>
 
-    <img src="../assets/icon.svg" alt="" width="140" height="140" />
+    <img src="../assets/logo.svg" alt="" width="140" height="140" />
   </div>
 </template>
 <style scoped>
