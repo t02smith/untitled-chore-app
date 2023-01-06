@@ -66,11 +66,13 @@
             <div v-if="chosenHome">
               <hr />
               <div v-if="chosenHome.creator !== user.user.username">
-                <button class="dropdown-item" @click="leaveHome">⚠️ Leave home</button>
+                <button class="dropdown-item" @click="leaveHome" :disabled="refreshing">⚠️ Leave home</button>
               </div>
               <div v-else>
-                <button class="dropdown-item" @click="regenerateTimetable">♻️ Regenerate timetable</button>
-                <button class="dropdown-item" @click="deleteHome">🗑️ Delete home</button>
+                <button class="dropdown-item" @click="regenerateTimetable" :disabled="refreshing">
+                  ♻️ Regenerate timetable
+                </button>
+                <button class="dropdown-item" @click="deleteHome" :disabled="refreshing">🗑️ Delete home</button>
               </div>
             </div>
           </ul>
@@ -125,7 +127,10 @@ const chosenHome = ref(null);
 const homeResidents = ref(null);
 const homeTimetable = ref(null);
 
-const refreshing = computed(() => !(userHomes.value && homeResidents.value && homeTimetable.value));
+const loadingRequest = ref(false);
+const refreshing = computed(
+  () => !(userHomes.value && homeResidents.value && homeTimetable.value) || loadingRequest.value
+);
 
 const route = useRoute();
 const router = useRouter();
@@ -136,21 +141,26 @@ async function refresh() {
   homeResidents.value = null;
   homeTimetable.value = null;
   userHomes.value = await home.getHomes();
+  loadingRequest.value = false;
 }
 
 async function complete(id) {
+  loadingRequest.value = true;
   const res = await home.completeChore(chosenHome.value.creator, chosenHome.value.name, id);
   if (res) {
     refresh();
   }
+  loadingRequest.value = false;
 }
 
 async function leaveHome() {
+  loadingRequest.value = true;
   await home.leaveHome(chosenHome.value.creator, chosenHome.value.name);
   refresh();
 }
 
 async function deleteHome() {
+  loadingRequest.value = true;
   await home.deleteHome(chosenHome.value.creator, chosenHome.value.name);
   refresh();
 }

@@ -7,6 +7,7 @@ import User from "../views/User.vue";
 import HomeDashboard from "../views/home/HomeDashboard.vue";
 import CreateHome from "../views/home/CreateHome.vue";
 import Root from "../views/Root.vue";
+import { useUserStore } from "../stores/user";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

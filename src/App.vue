@@ -11,6 +11,10 @@ const user = useUserStore();
 const route = useRoute();
 const path = computed(() => route.path);
 
+router.afterEach((to, from, failure) => {
+  user.error = null;
+});
+
 // if (!user.accessToken && path !== "/login" && path !== "/register") {
 //   router.push("/");
 // }
@@ -22,7 +26,7 @@ const path = computed(() => route.path);
 
     <LoginPrompt v-if="!user.accessToken && !['/', '/login', '/register'].includes(path)" />
 
-    <Error class="container my-3" />
+    <Error class="container my-3" v-if="!['/login', '/register'].includes(path)" />
 
     <!-- Displays current route -->
     <main>
