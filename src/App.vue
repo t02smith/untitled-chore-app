@@ -10,8 +10,8 @@ const user = useUserStore();
 const route = useRoute();
 const path = computed(() => route.path);
 
-if (!user.accessToken && path !== '/login' && path !== '/register') {
-    router.push('/');
+if (!user.accessToken && path !== '/' && path !== '/register') {
+  router.push('/');
 }
 </script>
 
@@ -27,9 +27,23 @@ if (!user.accessToken && path !== '/login' && path !== '/register') {
       </div>
     </div>
 
-    <!-- Displays current route -->
-    <router-view />
+    <!-- Displays current route with fade transition-->
+    <router-view v-slot="{ Component }">
+      <Transition name="page-opacity" mode="out-in">
+        <component :is="Component"></component>
+      </Transition>
+    </router-view>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.page-opacity-enter-active,
+.page-opacity-leave-active {
+  transition: 300ms ease all;
+}
+
+.page-opacity-enter-from,
+.page-opacity-leave-to {
+  opacity: 0;
+}
+</style>

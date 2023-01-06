@@ -2,42 +2,48 @@
 </script>
 
 <template>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand">Untitled</a>
-            <img src="@/assets/logo.png" alt="Image can't be displayed" width="40" height="40">
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand">Untitled</a>
+      <img src="@/assets/logo.png" alt="Image can't be displayed" width="40" height="40">
 
-            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                <div class="navbar-nav">
-                    <router-link to="/home/dashboard" class="nav-link" tag="link">Home</router-link>
-                    <router-link to="/chores" class="nav-link" tag="link">Chores</router-link>
-                    <router-link to="/help" class="nav-link" tag="link">Help</router-link>
-                </div>
-            </div>
-
-            <router-link to="/user" class="nav-link"><img src="@/assets/userIcon.png" alt="Image can't be displayed"
-                    width="40" height="40"></router-link>
-        </div>
-    </nav>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <ul class="navbar-nav me-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Home
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><router-link to="/home/create" class="dropdown-item">Create</router-link></li>
+            <li><router-link to="/home/dashboard" class="dropdown-item">Dashboard</router-link></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <router-link to="/chores" class="nav-link">Chores</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/help" class="nav-link">Help</router-link>
+        </li>
+      </ul>
+      <router-link to="/user" class="nav-link"><img src="@/assets/userIcon.png" alt="Image can't be displayed"
+          width="40" height="40"></router-link>
+      </div>
+      </div>
+  </nav>
 </template>
 
 <style scoped>
 .router-link-exact-active {
-    border-bottom: 2px solid white;
-    color: white;
+  /* border-bottom: 2px solid white; */
+  color: white;
 }
 
-div.navbar-nav {
-    /* This is extremely jank must change lol */
-    /* Centering not working properly otherwise */
-    left: 25%;
-}
-
-div.navbar-nav :link {
-    margin-left: 6em;
+li.nav-item {
+  margin-left: 1em;
 }
 
 img {
-    margin-right: 0.5em;
+  margin-right: 0.5em;
+  float: right;
 }
 </style>

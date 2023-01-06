@@ -16,6 +16,12 @@ async function login() {
     if (res) router.back();
   }
 }
+
+// If user tries to access login page when logged in
+// Redirect to home page
+if (user.accessToken) {
+  router.push('/home/dashboard')
+}
 </script>
 
 <template>
@@ -41,7 +47,7 @@ async function login() {
     <button type="submit" class="btn btn-primary">Log in</button>
   </form>
 
-  <div v-else>You are already logged in</div>
+  <!-- <div v-else>You are already logged in</div> -->
 </template>
 
 <style scoped>
