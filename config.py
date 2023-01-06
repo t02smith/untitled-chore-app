@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ? run the application using the test database
-TEST_MODE = True
+TEST_MODE = False
 
 config = {
     "resource_uri": os.getenv("TEST_COSMOS_RESOURCE_URI")
