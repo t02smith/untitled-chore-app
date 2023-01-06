@@ -29,21 +29,21 @@ if (!user.accessToken && path !== '/' && path !== '/register') {
 
     <!-- Displays current route with fade transition-->
     <router-view v-slot="{ Component }">
-      <Transition name="page-opacity" mode="out-in">
-        <component :is="Component"></component>
-      </Transition>
+      <transition name="fade" mode="out-in">
+        <component :is="Component" />
+      </transition>
     </router-view>
   </div>
 </template>
 
 <style scoped>
-.page-opacity-enter-active,
-.page-opacity-leave-active {
-  transition: 300ms ease all;
+.fade-enter-active,
+.fade-opacity-leave-active {
+  transition: opacity 300ms ease-out;
 }
 
-.page-opacity-enter-from,
-.page-opacity-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 </style>

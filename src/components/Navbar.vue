@@ -10,9 +10,9 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <ul class="navbar-nav me-auto">
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <div class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Home
-          </a>
+          </div>
           <ul class="dropdown-menu dropdown-menu-dark">
             <li><router-link to="/home/create" class="dropdown-item">Create</router-link></li>
             <li><router-link to="/home/dashboard" class="dropdown-item">Dashboard</router-link></li>

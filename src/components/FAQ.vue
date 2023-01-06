@@ -12,49 +12,51 @@ function setFaq(q, a) {
 
 <template>
     <div class="faq">
-        <h1 class="display-6">FAQs</h1>
-        <ul class="list-group">
-            <li class="list-group-item">Can I be in more than 1 home? <button type="button"
-                    class="btn btn-light btn-sml"
-                    @click="setFaq('Can I be in more than 1 home?', 'Yes - to join a new home go to ')"
-                    data-bs-toggle="modal" data-bs-target="#exampleModal"><img src="@/assets/add.png"
-                        alt="Image can't be displayed" width="10" height="10"></button></li>
-            <li class="list-group-item">How are chores assigned? <button type="button" class="btn btn-light btn-sml"
-                    @click="setFaq('How are chores assigned?', 'Each home has an admin user who assigns chores. The schedule is determined based on your university timetable')"
-                    data-bs-toggle="modal" data-bs-target="#exampleModal"><img src="@/assets/add.png"
-                        alt="Image can't be displayed" width="10" height="10"></button></li>
-            <li class="list-group-item">What if I am unable to do a chore? <button type="button"
-                    class="btn btn-light btn-sml"
-                    @click="setFaq('What if I am unable to do a chore?', 'Mark the chore as done and make the admin aware that it is incomplete. If you forget to mark as complete your chore score will be affected')"
-                    data-bs-toggle="modal" data-bs-target="#exampleModal"><img src="@/assets/add.png"
-                        alt="Image can't be displayed" width="10" height="10"></button></li>
-            <li class="list-group-item">What does chore score mean? <button type="button" class="btn btn-light btn-sml"
-                    @click="setFaq('What does chore score mean?', 'It reflects how consistent you are at doing your chores, where a higher score means you are more consistent')"
-                    data-bs-toggle="modal" data-bs-target="#exampleModal"><img src="@/assets/add.png"
-                        alt="Image can't be displayed" width="10" height="10"></button></li>
-            <li class="list-group-item">How do I know when to do chores? <button type="button" class="btn btn-light btn-sml"
-                    @click="setFaq('How do I know when to do chores?', 'Your TODO list is available on the home dashboard')"
-                    data-bs-toggle="modal" data-bs-target="#exampleModal"><img src="@/assets/add.png"
-                        alt="Image can't be displayed" width="10" height="10"></button></li>
-        </ul>
-    </div>
+        <div class="list">
+            <h1 class="display-6">FAQs</h1>
+            <ul class="list-group">
+                <li class="list-group-item">Can I be in more than 1 home? <button type="button"
+                        class="btn btn-light btn-sml"
+                        @click="setFaq('Can I be in more than 1 home?', 'Yes - to join a new home go to ')"
+                        data-bs-toggle="modal" data-bs-target="#exampleModal"><img src="@/assets/add.png"
+                            alt="Image can't be displayed" width="10" height="10"></button></li>
+                <li class="list-group-item">How are chores assigned? <button type="button" class="btn btn-light btn-sml"
+                        @click="setFaq('How are chores assigned?', 'Each home has an admin user who assigns chores. The schedule is determined based on your university timetable')"
+                        data-bs-toggle="modal" data-bs-target="#exampleModal"><img src="@/assets/add.png"
+                            alt="Image can't be displayed" width="10" height="10"></button></li>
+                <li class="list-group-item">What if I am unable to do a chore? <button type="button"
+                        class="btn btn-light btn-sml"
+                        @click="setFaq('What if I am unable to do a chore?', 'Mark the chore as done and make the admin aware that it is incomplete. If you forget to mark as complete your chore score will be affected')"
+                        data-bs-toggle="modal" data-bs-target="#exampleModal"><img src="@/assets/add.png"
+                            alt="Image can't be displayed" width="10" height="10"></button></li>
+                <li class="list-group-item">What does chore score mean? <button type="button"
+                        class="btn btn-light btn-sml"
+                        @click="setFaq('What does chore score mean?', 'It reflects how consistent you are at doing your chores, where a higher score means you are more consistent')"
+                        data-bs-toggle="modal" data-bs-target="#exampleModal"><img src="@/assets/add.png"
+                            alt="Image can't be displayed" width="10" height="10"></button></li>
+                <li class="list-group-item">How do I know when to do chores? <button type="button"
+                        class="btn btn-light btn-sml"
+                        @click="setFaq('How do I know when to do chores?', 'Your TODO list is available on the home dashboard')"
+                        data-bs-toggle="modal" data-bs-target="#exampleModal"><img src="@/assets/add.png"
+                            alt="Image can't be displayed" width="10" height="10"></button></li>
+            </ul>
+        </div>
 
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ question }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">{{ answer }}</div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ question }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">{{ answer }}</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-
 </template>
 
 <style scoped>
@@ -74,7 +76,7 @@ div.modal-body {
     color: black;
 }
 
-div.faq {
+div.list {
     position: fixed;
     top: 50%;
     left: 50%;
