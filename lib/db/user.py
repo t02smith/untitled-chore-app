@@ -90,5 +90,5 @@ async def new_user_score(user: types.User):
   user.scores.current_week = 0
   
   async with get_client() as client:
-    container = get_or_create_container(client, "users")
+    container = await get_or_create_container(client, "users")
     await container.upsert_item(user.to_json())

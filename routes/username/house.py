@@ -8,17 +8,24 @@ router = APIRouter(prefix="/{house_name}")
 
 
 @router.get(
-  "/", 
-  tags=["home"], 
-  status_code=200, 
-  response_model=types.Home, 
-  description="Returns a JSON object of a home if the user has sufficient permissions to view it.",
-  responses={
-    403: {"description": "User doesn't have permission to view this house", "model": err.HTTPError},
-    404: {"description": "House not found", "model": err.HTTPError}
-  }
+    "/",
+    tags=["home"],
+    status_code=200,
+    response_model=types.Home,
+    description="Returns a JSON object of a home if the user has sufficient permissions to view it.",
+    responses={
+        403: {
+            "description": "User doesn't have permission to view this house",
+            "model": err.HTTPError,
+        },
+        404: {"description": "House not found", "model": err.HTTPError},
+    },
 )
-async def get_home(username: str, house_name: str, user: types.User = Depends(userAuth.get_current_active_user)):
+async def get_home(
+    username: str,
+    house_name: str,
+    user: types.User = Depends(userAuth.get_current_active_user),
+):
     return await home.get_home_by_creator_and_name(username, house_name, user)
 
 
@@ -30,55 +37,102 @@ async def update_home(
     user: types.User = Depends(userAuth.get_current_active_user),
 ):
     if username != user.username:
-        raise HTTPException(403, detail="You do not have permission to update this home")
+        raise HTTPException(
+            403, detail="You do not have permission to update this home"
+        )
 
     return await home.update_home(newHome, username, house_name, user)
 
 
-@router.put(
-  "/timetable", 
-  tags=["home"],
-  description="Get this week's chore timetable or generate one if it doesn't exist or is expired",
-  status_code=200,
-  response_model=types.TimetableOut,
-  responses={
-    403: {"description": "You do not have permission to view this timetable", "model": err.HTTPError},
-    404: {"description": "House not found", "model": err.HTTPError}
-  }  
+@router.delete(
+    "/",
+    description="Delete a home if you are its creator",
+    tags=["home"],
+    status_code=204,
 )
-async def get_home_timetable(username: str, house_name: str, user: types.User = Depends(userAuth.get_current_active_user) ):
-    res = await timetable.get_or_generate_timetable(username, house_name, user)
-    if res is None:
-      raise HTTPException(500)
-    
-    return res
+async def delete_home(
+    username: str,
+    house_name: str,
+    user: types.User = Depends(userAuth.get_current_active_user),
+):
+    await home.delete_home(username, house_name, user)
 
 
 @router.put(
-  "/complete", 
-  description="Set a user's task to complete",
-  tags=["home", "timetable"],
-  status_code=200,
-  response_model=types.TimetabledChore,
-  responses={
-    302: {"description": "The timetable needs to be regenerated before this can be called"},
-    400: {"description": "The chore is already complete or the timetable is expired", "model": err.HTTPError},
-    403: {"description": "The chore isn't assigned to the user trying to complete or the user is not in the house", "model": err.HTTPError},
-    404: {"description": "The house doesn't exist or the chore isn't part of the timetable", "model": err.HTTPError}
-  }
+    "/timetable",
+    tags=["home"],
+    description="Get this week's chore timetable or generate one if it doesn't exist or is expired",
+    status_code=200,
+    response_model=types.TimetableOut,
+    responses={
+        403: {
+            "description": "You do not have permission to view this timetable",
+            "model": err.HTTPError,
+        },
+        404: {"description": "House not found", "model": err.HTTPError},
+    },
 )
-async def complete_task(username: str, house_name: str, chore_id: str, user: types.User = Depends(userAuth.get_current_active_user)):
-  return await timetable.complete_task(username, house_name, chore_id, user)
+async def get_home_timetable(
+    username: str,
+    house_name: str,
+    user: types.User = Depends(userAuth.get_current_active_user),
+    regenerate: bool = False
+):
+    do_regenerate = regenerate if username == user.username else False
+    return await timetable.get_or_generate_timetable(username, house_name, user, do_regenerate)
+
+@router.put(
+    "/complete",
+    description="Set a user's task to complete",
+    tags=["home", "timetable"],
+    status_code=200,
+    response_model=types.TimetabledChore,
+    responses={
+        302: {
+            "description": "The timetable needs to be regenerated before this can be called"
+        },
+        400: {
+            "description": "The chore is already complete or the timetable is expired",
+            "model": err.HTTPError,
+        },
+        403: {
+            "description": "The chore isn't assigned to the user trying to complete or the user is not in the house",
+            "model": err.HTTPError,
+        },
+        404: {
+            "description": "The house doesn't exist or the chore isn't part of the timetable",
+            "model": err.HTTPError,
+        },
+    },
+)
+async def complete_task(
+    username: str,
+    house_name: str,
+    chore_id: str,
+    user: types.User = Depends(userAuth.get_current_active_user),
+):
+    return await timetable.complete_task(username, house_name, chore_id, user)
+
 
 @router.get(
-  "/residents",
-  description="Get details about a home's residents",
-  tags=["home"],
-  status_code=200,
-  response_model=List[types.UserOut]
+    "/residents",
+    description="Get details about a home's residents",
+    tags=["home"],
+    status_code=200,
+    response_model=List[types.UserOut],
 )
-async def get_home_residents(username: str, house_name: str, user: types.User = Depends(userAuth.get_current_active_user)):
-  return list(map(lambda u: u.to_UserOut(), await home.get_home_residents(username, house_name, user)))
+async def get_home_residents(
+    username: str,
+    house_name: str,
+    user: types.User = Depends(userAuth.get_current_active_user),
+):
+    return list(
+        map(
+            lambda u: u.to_UserOut(),
+            await home.get_home_residents(username, house_name, user),
+        )
+    )
+
 
 # ! CHORES
 
@@ -101,6 +155,15 @@ async def get_house_chores(
     user: types.User = Depends(userAuth.get_current_active_user),
 ):
     return (await home.get_home_by_creator_and_name(username, house_name)).chores
+
+
+@router.delete("/leave", description="Leave a home", tags=["home"], status_code=204)
+async def leave_home(
+    username: str,
+    house_name: str,
+    user: types.User = Depends(userAuth.get_current_active_user),
+):
+    await home.leave_home(username, house_name, user)
 
 
 # ! INVITES
@@ -132,7 +195,10 @@ async def create_invite_link(
     tags=["user", "home"],
     response_model=types.Home,
     responses={
-        400: {"description": "Invalid invite link or user already in home","model": err.HTTPError},
+        400: {
+            "description": "Invalid invite link or user already in home",
+            "model": err.HTTPError,
+        },
         404: {"description": "Home or invite link not found", "model": err.HTTPError},
     },
 )
@@ -142,4 +208,4 @@ async def join_home_via_invite_link(
     invite_id: str,
     user: types.User = Depends(userAuth.get_current_active_user),
 ):
-    return await home.join_home_via_invite_link(username, house_name, invite_id, user)       
+    return await home.join_home_via_invite_link(username, house_name, invite_id, user)

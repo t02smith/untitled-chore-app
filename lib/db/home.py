@@ -118,7 +118,7 @@ async def get_users_homes(user: types.User) -> List[types.Home]:
 
 
 async def delete_home(creator: str, home_name: str, caller: types.User):
-    if caller != creator:
+    if caller.username != creator:
         raise HTTPException(
             403, detail="You do not have permission to delete this home"
         )
@@ -128,6 +128,19 @@ async def delete_home(creator: str, home_name: str, caller: types.User):
         container = await db.get_or_create_container(client, "homes")
         await container.delete_item(home.id, partition_key=home.id)
 
+
+async def leave_home(creator: str, home_name: str, caller: types.User):
+  if caller.username == creator:
+    raise HTTPException(400, detail="You cannot leave a home you created. You can only delete it")
+  
+  home = await get_home_by_creator_and_name(creator, home_name, caller)
+  if caller.username not in home.residents:
+    raise HTTPException(400, detail="You are not a resident of this home")
+  
+  home.residents.remove(caller.username)
+  async with db.get_client() as client:
+    container = await db.get_or_create_container(client, "homes")
+    await container.upsert_item(home.to_json())
 
 async def create_invite_link(
     creator: str, house_name: str, caller: types.User, link_alive_time_hours: int = 24

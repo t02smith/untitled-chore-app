@@ -22,16 +22,16 @@ async def _generate_timetable(home_creator: str, home_name: str, caller: types.U
       
     return timetable
 
-async def get_or_generate_timetable(home_creator: str, home_name: str, caller: types.User) -> types.TimetableOut:
+async def get_or_generate_timetable(home_creator: str, home_name: str, caller: types.User, regenerate: bool) -> types.TimetableOut:
     home = await homeDB.get_home_by_creator_and_name(home_creator, home_name, caller)
     existing_timetable = await get_homes_timetable(home.id)
     
     # ? timetable exists and is still in date
     if existing_timetable is not None:
-      if existing_timetable.end > datetime.now().isoformat():
+      if existing_timetable.end > datetime.now().isoformat() and not regenerate:
         return await timetable_to_timetableOut(existing_timetable)
       else:
-        for resident in home.residents:
+        for resident in await userDB.get_users_by_username_from_list(home.residents):
           await userDB.new_user_score(resident)
     
     chore_objs = await chores.get_chores_by_id_from_list(home.chores)
