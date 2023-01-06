@@ -1,4 +1,4 @@
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 import { handleResponse } from "./util";
@@ -60,7 +60,7 @@ export const useUserStore = defineStore("users", () => {
         surname: surname,
         email: email,
       },
-      { validateStatus: () => true }
+      { validateStatus: () => true, withCredentials: true }
     );
 
     if (res.status !== 201) return false;

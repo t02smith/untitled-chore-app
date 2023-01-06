@@ -1,6 +1,5 @@
 import axios from "axios";
 import { defineStore } from "pinia";
-import { useUserStore } from "./user";
 import { handleResponse } from "./util";
 
 export const useChoreStore = defineStore("chores", () => {

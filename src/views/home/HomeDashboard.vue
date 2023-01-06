@@ -17,7 +17,12 @@
           <li
             v-if="userHomes"
             v-for="h in userHomes.filter((h) => h !== chosenHome.value)"
-            @click="() => (chosenHome = h)">
+            @click="
+              () => {
+                chosenHome = h;
+                router.replace({ path: route.path, query: { home: h.name } });
+              }
+            ">
             <a class="dropdown-item d-flex align-items-center gap-2" style="font-size: 1rem" href="#">
               <font-awesome-icon icon="fa-solid fa-house" />
               <strong>{{ h.creator }}/{{ h.name }}</strong></a
@@ -57,10 +62,17 @@
             </button>
             <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#join-home">🏡 Join home</button>
             <router-link to="/home/create" class="dropdown-item">🆕 Create home</router-link>
-            <hr v-if="chosenHome && chosenHome.creator === user.user.username" />
-            <button v-if="chosenHome && chosenHome.creator === user.user.username" class="dropdown-item">
-              ⚙️ Settings
-            </button>
+
+            <div v-if="chosenHome">
+              <hr />
+              <div v-if="chosenHome.creator !== user.user.username">
+                <button class="dropdown-item" @click="leaveHome">⚠️ Leave home</button>
+              </div>
+              <div v-else>
+                <button class="dropdown-item" @click="regenerateTimetable">♻️ Regenerate timetable</button>
+                <button class="dropdown-item" @click="deleteHome">🗑️ Delete home</button>
+              </div>
+            </div>
           </ul>
         </div>
       </div>
@@ -102,7 +114,7 @@ import JoinHouse from "../../components/House/JoinHouse.vue";
 import { useHomeStore } from "../../stores/home";
 import { useUserStore } from "../../stores/user";
 import HouseInvite from "../../components/House/HouseInvite.vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const home = useHomeStore();
 const user = useUserStore();
@@ -116,6 +128,7 @@ const homeTimetable = ref(null);
 const refreshing = computed(() => !(userHomes.value && homeResidents.value && homeTimetable.value));
 
 const route = useRoute();
+const router = useRouter();
 
 async function refresh() {
   if (user.accessToken === null) return;
@@ -132,17 +145,35 @@ async function complete(id) {
   }
 }
 
+async function leaveHome() {
+  await home.leaveHome(chosenHome.value.creator, chosenHome.value.name);
+  refresh();
+}
+
+async function deleteHome() {
+  await home.deleteHome(chosenHome.value.creator, chosenHome.value.name);
+  refresh();
+}
+
+async function regenerateTimetable() {
+  homeResidents.value = null;
+  homeTimetable.value = null;
+  home.getHomeResidents(chosenHome.value.creator, chosenHome.value.name).then((data) => (homeResidents.value = data));
+  home.getTimetable(chosenHome.value.creator, chosenHome.value.name, true).then((data) => (homeTimetable.value = data));
+}
+
 onMounted(() => refresh());
 
 watch(userHomes, () => {
   if (userHomes.value === null || userHomes.value.length === 0) return;
 
   const selected = userHomes.value.filter((h) => `${h.creator}/${h.name}` === route.query.home);
-
   chosenHome.value = selected.length === 0 ? userHomes.value[0] : selected[0];
 });
 
 watch(chosenHome, async () => {
+  homeResidents.value = null;
+  homeTimetable.value = null;
   if (chosenHome.value === null) return;
 
   home.getHomeResidents(chosenHome.value.creator, chosenHome.value.name).then((data) => (homeResidents.value = data));

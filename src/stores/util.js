@@ -9,7 +9,6 @@ export function handleResponse(response, expectedStatus) {
   if (response.status === 401) {
     user.accessToken = null;
     cookies.remove("access_token");
-    return null;
   }
 
   if (response.status !== expectedStatus) {

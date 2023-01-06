@@ -80,12 +80,16 @@ export const useHomeStore = defineStore("homes", () => {
     return handleResponse(res, 200);
   }
 
-  async function getTimetable(creator, homeName) {
-    const res = await axios.put(`${import.meta.env.VITE_API_BASE}/${creator}/${homeName}/timetable`, null, {
-      headers: { Authorization: `Bearer ${user.accessToken}` },
-      validateStatus: () => true,
-      withCredentials: true,
-    });
+  async function getTimetable(creator, homeName, regenerate = false) {
+    const res = await axios.put(
+      `${import.meta.env.VITE_API_BASE}/${creator}/${homeName}/timetable?regenerate=${regenerate}`,
+      null,
+      {
+        headers: { Authorization: `Bearer ${user.accessToken}` },
+        validateStatus: () => true,
+        withCredentials: true,
+      }
+    );
 
     return handleResponse(res, 200);
   }
@@ -104,6 +108,26 @@ export const useHomeStore = defineStore("homes", () => {
     return handleResponse(res, 200);
   }
 
+  async function leaveHome(creator, homeName) {
+    const res = await axios.delete(`${import.meta.env.VITE_API_BASE}/${creator}/${homeName}/leave`, {
+      headers: { Authorization: `Bearer ${user.accessToken}` },
+      validateStatus: () => true,
+      withCredentials: true,
+    });
+
+    return handleResponse(res, 204);
+  }
+
+  async function deleteHome(creator, homeName) {
+    const res = await axios.delete(`${import.meta.env.VITE_API_BASE}/${creator}/${homeName}/`, {
+      headers: { Authorization: `Bearer ${user.accessToken}` },
+      validateStatus: () => true,
+      withCredentials: true,
+    });
+
+    return handleResponse(res, 204);
+  }
+
   return {
     getHome,
     getHomes,
@@ -114,5 +138,7 @@ export const useHomeStore = defineStore("homes", () => {
     joinHome,
     getTimetable,
     completeChore,
+    leaveHome,
+    deleteHome,
   };
 });

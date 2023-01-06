@@ -30,7 +30,7 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useHomeStore } from "../../stores/home";
 import { useUserStore } from "../../stores/user";
 
@@ -61,4 +61,12 @@ onMounted(async () => {
   if (user.accessToken === null) return;
   inviteLink.value = await home.createInviteLink(props.creator, props.homeName);
 });
+
+watch(
+  computed(() => `${props.creator}/${props.homeName}`),
+  async () => {
+    if (user.accessToken === null) return;
+    inviteLink.value = await home.createInviteLink(props.creator, props.homeName);
+  }
+);
 </script>
