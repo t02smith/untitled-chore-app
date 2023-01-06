@@ -3,30 +3,40 @@
 </script>
 
 <template>
-    <div class="changeEmail">
-        
+    <div class="changeEmail"> 
         <h1 class="display-6">Change Email</h1>
-        <div class="mb-3">
-            <label for="formGroupExampleInput2" class="form-label">New Email</label>
-            <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="New Email">
+        <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="newEmail" placeholder="New Email">
+            <label for="newEmail">New Email</label>
         </div>
-        <div class="mb-3">
-            <label for="formGroupExampleInput2" class="form-label">Current Password</label>
-            <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="Current Password">
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="currentPassword" placeholder="Current Password">
+            <label for="currentPassword">Current Password</label>
         </div>
-        <button type="button" class="btn btn-primary"
-        style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .99rem;">
+        <button type="button" class="btn btn-primary">
         Save
         </button>
-    </div>
-    
+    </div>  
 </template>
 
 <style scoped>
-
-    div.changeEmail {
-        left: 100%;
-        top: 50%;
+    .changeEmail {
+        min-width: 500px;
+        min-height: 500px;
+        padding-top: 50px;
     }
 
+    .display-6 {
+        color: white;
+        margin-bottom: 40px;
+    }
+
+    .btn {
+        width: 100px;
+    }
+
+    .mb-3 {
+        color: black;
+        width:250px;
+    }
 </style>
