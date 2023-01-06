@@ -5,7 +5,7 @@ from starlette.responses import RedirectResponse
 from typing import List
 
 async def _generate_timetable(home_creator: str, home_name: str, caller: types.User, home: types.Home, chore_objs: List[types.Chore]) -> types.Timetable:
-    sorted_chores = sorted(chore_objs, key=lambda c: c.expected_time, reverse=True)
+    sorted_chores = sorted(chore_objs, key=lambda c: c.score, reverse=True)
     residents = list(map(lambda u: [u, 0], home.residents))
     timetable = types.Timetable(
       id="0",

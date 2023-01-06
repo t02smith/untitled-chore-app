@@ -182,6 +182,7 @@ async def join_home_via_invite_link(
     home: types.Home = await get_home_by_creator_and_name(
         home_creator, home_name, caller, allow_all_users=True
     )
+    
     if home.invite_link.id != invite_id:
         raise HTTPException(404, detail="Invite link not found")
 
