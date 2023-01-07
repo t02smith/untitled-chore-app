@@ -29,9 +29,15 @@
       </div>
       </div>
   </nav>
+  <div class="space">
+  </div>
 </template>
 
 <style scoped>
+/* yes i know it is jank */
+div.space {
+  padding-top: 5em;
+}
 .router-link-exact-active {
   color: white;
 }
