@@ -10,18 +10,12 @@
           <h6 class="card-subtitle" style="margin-top: -0.5rem" :style="`color: ${props.color};`">
             {{ props.room }}
           </h6>
-          <b v-if="props.expectedTime" class="text-muted">
-            <font-awesome-icon icon="fa-solid fa-stopwatch" /> {{ props.expectedTime }}
+          <b v-if="props.expectedTime && props.difficulty" class="text-muted">
+            {{ difficultyToSymbol() }} • <font-awesome-icon icon="fa-solid fa-stopwatch" /> {{ props.expectedTime }}
           </b>
         </div>
-        <input
-          v-if="!props.noToggle"
-          type="checkbox"
-          name=""
-          id=""
-          class="form-check-input ms-2 bg-secondary justify-self-end"
-          style="width: 2rem; height: 2rem"
-          @click="onToggle" />
+
+        <slot />
       </div>
     </div>
   </div>
@@ -42,22 +36,34 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: "#ccc",
+    default: "#fff",
   },
   icon: {
     type: String,
-    required: true,
-  },
-  onToggle: {
-    type: Function,
-  },
-  noToggle: {
-    type: Boolean,
-    default: true,
+    required: "fa-solid fa-house",
   },
   expectedTime: {
     type: Number,
     default: null,
   },
+  difficulty: {
+    type: Number,
+    default: null,
+  },
 });
+
+function difficultyToSymbol() {
+  switch (props.difficulty) {
+    case 1:
+      return "⬜";
+    case 2:
+      return "🟩";
+    case 3:
+      return "🟦";
+    case 4:
+      return "🟪";
+    case 5:
+      return "🟧";
+  }
+}
 </script>

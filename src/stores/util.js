@@ -1,11 +1,14 @@
 import { useUserStore } from "./user";
+import { useCookies } from "vue3-cookies";
+
+const { cookies } = useCookies();
 
 export function handleResponse(response, expectedStatus) {
   const user = useUserStore();
 
   if (response.status === 401) {
     user.accessToken = null;
-    return null;
+    cookies.remove("access_token");
   }
 
   if (response.status !== expectedStatus) {
@@ -13,6 +16,5 @@ export function handleResponse(response, expectedStatus) {
     return null;
   }
 
-  user.error = null;
   return response.data;
 }

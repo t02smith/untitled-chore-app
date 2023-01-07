@@ -1,5 +1,4 @@
-<script setup>
-</script>
+<script setup></script>
 
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
@@ -45,5 +44,9 @@ li.nav-item {
 img {
   margin-right: 0.5em;
   float: right;
+}
+
+h5 {
+  margin: 0;
 }
 </style>

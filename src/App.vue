@@ -5,27 +5,28 @@ import { useUserStore } from "./stores/user";
 import { useRoute } from "vue-router";
 import { computed } from "vue";
 import router from "./router";
+import Error from "./components/Error.vue";
 
 const user = useUserStore();
 const route = useRoute();
 const path = computed(() => route.path);
 
-if (!user.accessToken && path !== '/' && path !== '/register') {
-  router.push('/');
-}
+router.afterEach((to, from, failure) => {
+  user.error = null;
+});
+
+// if (!user.accessToken && path !== "/login" && path !== "/register") {
+//   router.push("/");
+// }
 </script>
 
 <template>
   <div>
-    <NavBar />
+    <NavBar v-if="path !== '/'" />
 
-    <!-- <LoginPrompt v-if="!user.accessToken && path !== '/login' && path !== '/register'" /> -->
+    <LoginPrompt v-if="!user.accessToken && !['/', '/login', '/register'].includes(path)" />
 
-    <div class="container my-3" v-if="user.error">
-      <div class="alert alert-danger">
-        <h6 class="alert-heading">❌ {{ user.error }}</h6>
-      </div>
-    </div>
+    <Error class="container my-3" v-if="!['/login', '/register'].includes(path)" />
 
     <!-- Displays current route with fade transition-->
     <router-view v-slot="{ Component }">
