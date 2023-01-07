@@ -185,5 +185,4 @@ class HomeIn(BaseModel):
 
 
 class HomeUpdate(BaseModel):
-    name: str | None = None
-    chores: List[str] | None = None
+    chores: List[str]

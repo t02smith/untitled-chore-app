@@ -9,6 +9,7 @@ router = APIRouter(prefix="/chores")
 @router.post(
     "/",
     description="Creates a new chore by a specific user",
+    status_code=201,
     name="Create Chore",
     response_model=types.Chore,
     tags=["chores"],

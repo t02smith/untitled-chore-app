@@ -98,9 +98,20 @@ async def update_home(
     async with db.get_client() as client:
         container_homes = await db.get_or_create_container(client, "homes")
         home = await get_home_by_creator_and_name(creator, house_name, user)
-        home.name = home.name if homeUpdate.name == None else homeUpdate.name
+        
+        for c in homeUpdate.chores:
+          if c not in home.chores:
+            home.chores.append(c)
+        
         return types.Home(**await container_homes.upsert_item(home.__dict__))
 
+async def remove_chores_from_home(homeUpdate: types.HomeUpdate, creator: str, house_name: str, user: types.User):
+    async with db.get_client() as client:
+        container_homes = await db.get_or_create_container(client, "homes")
+        home = await get_home_by_creator_and_name(creator, house_name, user)
+        home.chores = list(filter(lambda c: c not in homeUpdate.chores, home.chores))
+        
+        return types.Home(**await container_homes.upsert_item(home.__dict__))
 
 async def get_users_homes(user: types.User) -> List[types.Home]:
     async with db.get_client() as client:

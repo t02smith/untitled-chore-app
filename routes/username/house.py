@@ -29,11 +29,11 @@ async def get_home(
     return await home.get_home_by_creator_and_name(username, house_name, user)
 
 
-@router.put("/", description="Update an existing house", tags=["home"])
-async def update_home(
+@router.put("/chores", description="Add chores to a", tags=["home"])
+async def add_chores(
     username: str,
     house_name: str,
-    newHome: types.HomeIn,
+    newHome: types.HomeUpdate,
     user: types.User = Depends(userAuth.get_current_active_user),
 ):
     if username != user.username:
@@ -42,6 +42,21 @@ async def update_home(
         )
 
     return await home.update_home(newHome, username, house_name, user)
+
+
+@router.put("/chores/remove", description="Add chores to a", tags=["home"])
+async def add_chores(
+    username: str,
+    house_name: str,
+    newHome: types.HomeUpdate,
+    user: types.User = Depends(userAuth.get_current_active_user),
+):
+    if username != user.username:
+        raise HTTPException(
+            403, detail="You do not have permission to update this home"
+        )
+
+    return await home.remove_chores_from_home(newHome, username, house_name, user)
 
 
 @router.delete(
@@ -76,10 +91,13 @@ async def get_home_timetable(
     username: str,
     house_name: str,
     user: types.User = Depends(userAuth.get_current_active_user),
-    regenerate: bool = False
+    regenerate: bool = False,
 ):
     do_regenerate = regenerate if username == user.username else False
-    return await timetable.get_or_generate_timetable(username, house_name, user, do_regenerate)
+    return await timetable.get_or_generate_timetable(
+        username, house_name, user, do_regenerate
+    )
+
 
 @router.put(
     "/complete",

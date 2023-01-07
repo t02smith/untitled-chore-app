@@ -58,17 +58,6 @@ async def upload_timetable(
     io.read_calendar(url)
     return "OK"
 
-# @router.get(
-#     "",
-#     description="Gets information about a user",
-#     tags=["user"],
-#     response_model=types.UserOut,
-#     status_code=200,
-#     responses={404: {"message": "user not found", "model": err.HTTPError}},
-# )
-# async def get_user_info(user: types.User = Depends(get_current_active_user)):
-#     return user.to_UserOut()
-
 
 @router.put(
     "",
