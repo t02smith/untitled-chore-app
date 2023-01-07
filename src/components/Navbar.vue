@@ -4,7 +4,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container-fluid">
       <a class="navbar-brand">Untitled</a>
-      <img src="@/assets/logo.png" alt="Image can't be displayed" width="40" height="40">
+      <img src="@/assets/logo.svg" alt="Image can't be displayed" width="40" height="40">
 
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <ul class="navbar-nav me-auto">
