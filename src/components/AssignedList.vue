@@ -121,7 +121,6 @@ function deleteChore(chore) {
 
 <style scoped>
 h1.display-6 {
-    left: 30%;
     color: white;
     font-size: 32px;
 }
@@ -132,8 +131,12 @@ h5 {
 }
 
 #housemates {
-    left: 110%;
     width: 400px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
 }
 
 li.list-group-item {
@@ -147,11 +150,6 @@ li.list-group-item:hover {
 
 button.btn-light {
     border-radius: 24px;
-}
-
-#chores {
-    left: 350%;
-    bottom: 145px;
 }
 
 #binButton {

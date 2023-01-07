@@ -33,7 +33,6 @@
 
 <style scoped>
 .router-link-exact-active {
-  /* border-bottom: 2px solid white; */
   color: white;
 }
 
