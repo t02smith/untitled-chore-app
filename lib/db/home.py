@@ -85,6 +85,7 @@ async def create_home(home: types.HomeIn, user: types.User):
                 "chores": [] if home.chores is None else home.chores,
                 "creator": user.username,
                 "invite_link": None,
+                "posts": []
             },
             enable_automatic_id_generation=True,
         )
@@ -207,3 +208,19 @@ async def join_home_via_invite_link(
     async with db.get_client() as client:
         container = await db.get_or_create_container(client, "homes")
         return types.Home(**await container.upsert_item(home.to_json()))
+
+
+async def upload_admin_post(creator: str, home_name: str, message: str, caller: types.User):
+  if creator != caller.username:
+    raise HTTPException(403, detail="You do not have permission to send messages")
+  
+  home = await get_home_by_creator_and_name(creator, home_name, caller)
+  post = types.AdminPost(timestamp=datetime.now().isoformat(), content=message)
+  home.posts.append(post)
+  home.posts = list(filter(lambda p: (datetime.now() - timedelta(days=7)).isoformat() < p.timestamp , home.posts))
+  
+  async with db.get_client() as client:
+    container = await db.get_or_create_container(client, "homes")
+    await container.upsert_item(home.to_json())
+    
+  return post

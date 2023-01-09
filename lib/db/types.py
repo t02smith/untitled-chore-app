@@ -142,6 +142,13 @@ class UserTimetable(BaseModel):
 
 # ! HOME
 
+class AdminPostIn(BaseModel):
+  content: str
+
+class AdminPost(BaseModel):
+  timestamp: str
+  content: str
+
 
 class HomeInvite(BaseModel):
     id: str
@@ -156,12 +163,12 @@ class Home(BaseModel):
     chores: List[str]
     creator: str
     invite_link: HomeInvite | None = None
+    posts: List[AdminPost]
 
     def to_json(self):
         dic = self.__dict__
-        dic["invite_link"] = (
-            None if self.invite_link is None else self.invite_link.__dict__
-        )
+        dic["invite_link"] = None if self.invite_link is None else self.invite_link.__dict__
+        dic["posts"] = list(map(lambda p: p.__dict__, self.posts))
 
         return dic
 
