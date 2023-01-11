@@ -178,12 +178,10 @@ async def create_invite_link(
     home.invite_link = types.HomeInvite(
         id=id, expiry=expiry, link=f"/api/v1/{creator}/{house_name}/join?invite_id={id}"
     )
-    dic = home.__dict__
-    dic["invite_link"] = home.invite_link.__dict__
 
     async with db.get_client() as client:
         container = await db.get_or_create_container(client, "homes")
-        await container.upsert_item(dic)
+        await container.upsert_item(home.to_json())
 
     return home.invite_link
 

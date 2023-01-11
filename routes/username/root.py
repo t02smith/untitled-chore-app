@@ -26,37 +26,19 @@ async def get_user_chores(
     return await chores.get_chores_from_user(username, user.username == username)
 
 
-@router.get(
-    "/timetable",
-    tags=["timetable"],
-    description="Returns the user's timetable that includes every household.",
-    status_code=200,
-    responses={
-      403: {"message": "A user tries to access someone else's timetable", "model": err.HTTPError}
-    }
-)
-async def get_user_timetable(
-    username, user: types.User = Depends(get_current_active_user)
-):
-    if username != user.username:
-      raise HTTPException(403)
-      
-    return await timetable.get_users_timetable(user)
+# @router.post(
+#   "/timetable/upload", 
+#   description="Upload your university timetable",
+#   tags=["timetable"]
+# )
+# async def upload_timetable(
+#     url: str, user: types.User = Depends(get_current_active_user)
+# ):
+#     if not re.search("https:\/\/timetable\.soton\.ac\.uk\/Feed\/Index\/.*", url):
+#         raise HTTPException(400, detail="Invalid URL")
 
-
-@router.post(
-  "/timetable/upload", 
-  description="Upload your university timetable",
-  tags=["timetable"]
-)
-async def upload_timetable(
-    url: str, user: types.User = Depends(get_current_active_user)
-):
-    if not re.search("https:\/\/timetable\.soton\.ac\.uk\/Feed\/Index\/.*", url):
-        raise HTTPException(400, detail="Invalid URL")
-
-    io.read_calendar(url)
-    return "OK"
+#     io.read_calendar(url)
+#     return "OK"
 
 
 @router.put(

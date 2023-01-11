@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
 from routes import chores, homes
 from routes.username import root as username
-from lib.db import types, db, user
+from lib.db import types, db, user, timetable
 from lib.auth.user import get_current_active_user
 from lib.auth import tokens, user as userAuth, auth
 from fastapi.security import OAuth2PasswordRequestForm
@@ -90,3 +90,18 @@ async def register(userInfo: types.UserIn, response: Response):
 )
 async def get_user_info(user: types.User = Depends(get_current_active_user)):
   return user.to_UserOut()
+
+
+@router.get(
+    "/me/timetable",
+    tags=["timetable"],
+    description="Returns the user's timetable that includes every household.",
+    status_code=200,
+    responses={
+      403: {"message": "A user tries to access someone else's timetable", "model": err.HTTPError}
+    }
+)
+async def get_user_timetable(
+    user: types.User = Depends(get_current_active_user)
+):      
+    return await timetable.get_users_timetable(user)

@@ -102,9 +102,11 @@ async def get_users_timetable(user: types.User) -> types.UserTimetable:
     )
     
     for t in timetables:
-      userTimetables.tasks[t.home_id] = list(map(
+      home = list(filter(lambda h: h.id == t.home_id, homes))[0]
+      
+      userTimetables.tasks[f"{home.creator}/{home.name}"] = list(map(
         lambda task: types.UserTimetableChore(chore_id=task.chore_id, complete=task.complete), 
-        t.tasks
+        filter(lambda t: t.user_id == user.username, t.tasks)
       ))
       
     return userTimetables
