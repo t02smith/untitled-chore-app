@@ -18,10 +18,11 @@ class UserIn(BaseModel):
 
 
 class UserUpdate(BaseModel):
+    currentPassword: str
     password: str | None = None
     first_name: str | None = None
     surname: str | None = None
-
+    email: str | None = None
 
 class UserOut(BaseModel):
     username: str
@@ -136,11 +137,19 @@ class UserTimetableChore(BaseModel):
 class UserTimetable(BaseModel):
   username: str
   tasks: Dict[str, List[UserTimetableChore]]
+  chores: List[Chore]
   
 
 
 
 # ! HOME
+
+class AdminPostIn(BaseModel):
+  content: str
+
+class AdminPost(BaseModel):
+  timestamp: str
+  content: str
 
 
 class HomeInvite(BaseModel):
@@ -156,12 +165,12 @@ class Home(BaseModel):
     chores: List[str]
     creator: str
     invite_link: HomeInvite | None = None
+    posts: List[AdminPost]
 
     def to_json(self):
         dic = self.__dict__
-        dic["invite_link"] = (
-            None if self.invite_link is None else self.invite_link.__dict__
-        )
+        dic["invite_link"] = None if self.invite_link is None else self.invite_link.__dict__
+        dic["posts"] = list(map(lambda p: p.__dict__, self.posts))
 
         return dic
 

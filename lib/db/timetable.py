@@ -98,14 +98,23 @@ async def get_users_timetable(user: types.User) -> types.UserTimetable:
     
     userTimetables = types.UserTimetable(
       username=user.username,
-      tasks={}
+      tasks={},
+      chores=[]
     )
     
+    included_chores = set()
     for t in timetables:
-      userTimetables.tasks[t.home_id] = list(map(
+      home = list(filter(lambda h: h.id == t.home_id, homes))[0]
+      
+      userTimetables.tasks[f"{home.creator}/{home.name}"] = list(map(
         lambda task: types.UserTimetableChore(chore_id=task.chore_id, complete=task.complete), 
-        t.tasks
+        filter(lambda t: t.user_id == user.username, t.tasks)
       ))
+      
+      for each_task in t.tasks:
+        included_chores.add(each_task.chore_id)
+        
+    userTimetables.chores = await chores.get_chores_by_id_from_list(list(included_chores)) 
       
     return userTimetables
   
