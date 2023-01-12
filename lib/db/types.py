@@ -18,10 +18,11 @@ class UserIn(BaseModel):
 
 
 class UserUpdate(BaseModel):
+    currentPassword: str
     password: str | None = None
     first_name: str | None = None
     surname: str | None = None
-
+    email: str | None = None
 
 class UserOut(BaseModel):
     username: str
@@ -136,6 +137,7 @@ class UserTimetableChore(BaseModel):
 class UserTimetable(BaseModel):
   username: str
   tasks: Dict[str, List[UserTimetableChore]]
+  chores: List[Chore]
   
 
 

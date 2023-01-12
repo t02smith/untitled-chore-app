@@ -41,18 +41,3 @@ async def get_user_chores(
 #     return "OK"
 
 
-@router.put(
-    "",
-    description="Update a user's information",
-    tags=["user"],
-    response_model=types.UserOut,
-    status_code=200,
-    responses={
-        403: {"message": "User not authorized to change this user's details","model": err.HTTPError,}
-    },
-)
-async def update_user_info(
-    updated: types.UserUpdate,
-    user: types.User = Depends(get_current_active_user),
-):
-    return await userDB.update_user(user, updated)
