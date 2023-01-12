@@ -104,7 +104,7 @@ async def update_home(
           if c not in home.chores:
             home.chores.append(c)
         
-        return types.Home(**await container_homes.upsert_item(home.__dict__))
+        return types.Home(**await container_homes.upsert_item(home.to_json()))
 
 async def remove_chores_from_home(homeUpdate: types.HomeUpdate, creator: str, house_name: str, user: types.User):
     async with db.get_client() as client:

@@ -41,7 +41,7 @@ async def add_chores(
             403, detail="You do not have permission to update this home"
         )
 
-    return await home.update_home(newHome, username, house_name, user)
+    return (await home.update_home(newHome, username, house_name, user)).to_json()
 
 
 @router.put("/chores/remove", description="Add chores to a", tags=["home"])
