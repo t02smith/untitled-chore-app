@@ -227,3 +227,14 @@ async def join_home_via_invite_link(
     user: types.User = Depends(userAuth.get_current_active_user),
 ):
     return await home.join_home_via_invite_link(username, house_name, invite_id, user)
+
+
+@router.post(
+  "/post",
+  description="Send an admin message to the home",
+  tags=["home"],
+  status_code=201,
+  response_model=types.AdminPost
+)
+async def upload_admin_post(username: str, house_name: str, message: types.AdminPostIn, user: types.User = Depends(userAuth.get_current_active_user)):
+  return await home.upload_admin_post(username, house_name, message.content, user)
