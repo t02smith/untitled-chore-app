@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
-from routes import chores, homes
+from routes import homes, chores as choreRoute
 from routes.username import root as username
-from lib.db import types, db, user as userDB, timetable
+from lib.db import types, db, user as userDB, timetable, chores
 from lib.auth.user import get_current_active_user
 from lib.auth import tokens, user as userAuth, auth
 from fastapi.security import OAuth2PasswordRequestForm
@@ -10,7 +10,7 @@ from lib import err
 
 
 router = APIRouter(prefix="/api/v1")
-router.include_router(chores.router)
+router.include_router(choreRoute.router)
 router.include_router(username.router)
 router.include_router(homes.router)
 
@@ -121,3 +121,15 @@ async def update_user_info(
     user: types.User = Depends(get_current_active_user),
 ):
     return await userDB.update_user(user, updated)
+  
+@router.get(
+    "/me/chores",
+    description="Get a list of chores created by a user",
+    tags=["chores", "user"],
+    status_code=200,
+    responses={404: {"message": "User not found", "model": err.HTTPError}},
+)
+async def get_user_chores(
+    user: types.User = Depends(get_current_active_user)
+):
+    return await chores.get_chores_from_user(user.username, True)

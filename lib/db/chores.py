@@ -28,14 +28,14 @@ async def get_chores_from_user(username: str, include_private: bool = False):
         container = await db.get_or_create_container(client, "chores")
         chores_res = container.query_items(
             f"""
-        SELECT c.id, c.name, c.author, c.expected_time, c.difficulty, c.description, c.public
+        SELECT c.id, c.name, c.author, c.expected_time, c.difficulty, c.description, c.public, c.room
         FROM chores c
         WHERE c.author=@username {'' if include_private else 'AND c.public'}
       """,
             parameters=[{"name": "@username", "value": username}],
         )
 
-        return [types.Chore(**c) async for c in chores_res]
+        return [c async for c in chores_res]
 
 
 async def get_chore_by_id(id: str) -> types.Chore | None:
