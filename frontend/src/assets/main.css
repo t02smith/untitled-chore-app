@@ -1,0 +1,16 @@
+@import './base.css';
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+#app {
+  font-weight: normal;
+}
+
+.font-bebas {
+  font-family: 'Bebas Neue', cursive;
+}
+
+@media (min-width: 1024px) {
+  body {
+    place-items: center;
+  }
+}
