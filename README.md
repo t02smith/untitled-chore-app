@@ -1,6 +1,5 @@
-<center> <img src="frontend/src/assets/logo.svg" alt="Logo" width="100"> </center>
-
-<center> <h1>Untitled Chore App</h1> </center>
+<div align="center"> <img src="frontend/src/assets/logo.svg" alt="Logo" width="100"> </div>
+<div align="center"> <h1>Untitled Chore App</h1> </div>
 
 ![GitHub top language](https://img.shields.io/github/languages/top/t02smith/untitled-chore-app?style=for-the-badge)
 ![GitHub language count](https://img.shields.io/github/languages/count/t02smith/untitled-chore-app?style=for-the-badge)
