@@ -11,6 +11,8 @@
 ![Vue.js Badge](https://img.shields.io/badge/Vue.js-4FC08D?logo=vuedotjs&logoColor=fff&style=for-the-badge)
 ![Bootstrap Badge](https://img.shields.io/badge/Bootstrap-7952B3?logo=bootstrap&logoColor=fff&style=for-the-badge)
 
+### Intro
+
 Have you ever:
 
 - ✅ Wondered why your house was such a mess?​
@@ -18,9 +20,27 @@ Have you ever:
 - ✅ Ran out of toilet paper because no one bought any?​
 - ✅ Had to dig out all your house-mates kitchen supplies from the sink?
 
-It's a common problem at home for a lot of people; especially students. **Untitled Chore App* provides automated chore timetabling for each home you find yourself a part of that is refreshed weekly and allows you track which of your housemates aren't pulling their weight.
+It's a common problem at home for a lot of people; especially students. **Untitled Chore App** provides automated chore timetabling for each home you find yourself a part of that is refreshed weekly and allows you track which of your housemates aren't pulling their weight. This project was part of the **Cloud Application Development** module at the **University of Southampton**. 
 
-This project was part of the **Cloud Application Development** module at the **University of Southampton** and was a group project by:
+### Dashboard
+
+<div align=center>
+    <img src="frontend/src/assets/dashboard.png" alt="Dashboard" width = 500>
+</div>
+
+### Create Home
+
+<div align=center>
+    <img src="frontend/src/assets/create-home.png" alt="Create home" width = 500>
+</div>
+
+### Deployment
+
+All deployment instructions can be found in [instructions.txt](./instructions.txt).
+It details how to setup the cloud database using Azure CosmosDB, the backend API
+using Azure Web App, and the frontend server using Google Cloud App Engine. 
+
+### Contributors
 
 - Myself 
 - Tom Cutts [https://github.com/Spratt93](https://github.com/Spratt93)
